@@ -16,7 +16,7 @@ func init() {
 	if result != 0 {
 		panic(fmt.Sprintf("hydrogen initialization failed, result code %d.", result))
 	}
-	fmt.Println("libhydrogen initialized")
+	// fmt.Println("libhydrogen initialized")
 }
 
 func CheckCtx(ctx string, wantlen int) {
