@@ -28,7 +28,7 @@ func RandomUniform(upper_bound uint32) uint32 {
 }
 
 func RandomBuf(l int) []byte {
-	CheckIntGreater(l, 0, "random buf size")
+	CheckIntGt(l, 0, "random buf size")
 	// void hydro_random_buf(void *buf, size_t len);
 	out := make([]byte, l)
 	C.hydro_random_buf(unsafe.Pointer(&out[0]), C.size_t(l))
@@ -37,7 +37,7 @@ func RandomBuf(l int) []byte {
 
 func RandomBufDeterministic(l int, seed []byte) []byte {
 	CheckSize(seed, RandomSeedBytes, "seed")
-	CheckIntGreater(l, 0, "random buf det size")
+	CheckIntGt(l, 0, "random buf det size")
 	out := make([]byte, l)
 	// void hydro_random_buf_deterministic(void *buf, size_t len, const uint8_t seed[hydro_random_SEEDBYTES]);
 	C.hydro_random_buf_deterministic(

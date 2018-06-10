@@ -40,10 +40,17 @@ func CheckIntInRange(n int, min int, max int, descrip string) {
 	}
 }
 
-// CheckIntMin checks if n is > lower
-func CheckIntGreater(n int, lower int, descrip string) {
+// CheckIntGt checks if n is > lower
+func CheckIntGt(n int, lower int, descrip string) {
 	if !(n > lower) {
 		panic(fmt.Sprintf("%s is not > %d", descrip, lower))
+	}
+}
+
+// CheckIntMin checks if n is > lower
+func CheckIntGtOrEq(n int, lower int, descrip string) {
+	if !(n >= lower) {
+		panic(fmt.Sprintf("%s is not >= %d", descrip, lower))
 	}
 }
 

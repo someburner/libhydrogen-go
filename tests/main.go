@@ -10,6 +10,7 @@ func main() {
 	fmt.Println("start")
 	fmt.Println(hydro.VersionVerbose())
 	fmt.Println("finish")
+	ExampleHash()
 	ExampleKdf()
 	ExampleRandom()
 	ExampleSecretbox()
@@ -22,6 +23,26 @@ const TEST_MID uint64 = 0
 
 const TEST_MSG1 = "testing 123"
 const TEST_MSG2 = "testing abc"
+
+func ExampleHash() {
+	fmt.Println("============= Hash =============")
+	fmt.Printf("HashBytes = %d\n", hydro.HashBytes)
+	fmt.Printf("HashBytesMax = %d\n", hydro.HashBytesMax)
+	fmt.Printf("HashBytesMin = %d\n", hydro.HashBytesMin)
+	fmt.Printf("HashContextBytes = %d\n", hydro.HashContextBytes)
+	fmt.Printf("HashKeyBytes = %d\n", hydro.HashKeyBytes)
+
+	fmt.Printf("\n--- HashKeygen ---\n")
+	sk := hydro.HashKeygen()
+	fmt.Printf("sk [%d] %s\n", len(sk), hydro.Bin2hex(sk))
+
+	fmt.Printf("\n--- HashHash ---\n")
+	hash, res := hydro.HashHash(hydro.HashBytes, []byte(TEST_MSG1), GOOD_CTX, sk)
+	if res != 0 {
+		panic("HashHash returned non-zero")
+	}
+	fmt.Printf("hash [%d] %s\n", len(hash), hydro.Bin2hex(hash))
+}
 
 func ExampleKdf() {
 	fmt.Println("============= Kdf =============")
