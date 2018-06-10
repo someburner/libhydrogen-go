@@ -5,9 +5,12 @@
 SHELL :=/bin/bash
 
 ################################################################################
-.PHONY: fmt run test
+.PHONY: fmt libhydrogen run test
 
-all: run
+all: libhydrogen
+
+libhydrogen:
+	make -C libhydrogen
 
 fmt:
 	$(SHELL) scripts/cmd.sh "fmt"
