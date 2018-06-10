@@ -40,6 +40,13 @@ func CheckIntInRange(n int, min int, max int, descrip string) {
 	}
 }
 
+// CheckIntMin checks if n is > lower
+func CheckIntGreater(n int, lower int, descrip string) {
+	if !(n > lower) {
+		panic(fmt.Sprintf("%s is not > %d", descrip, lower))
+	}
+}
+
 //MemZero sets the buffer to zero
 func MemZero(buf []byte) {
 	if len(buf) > 0 {

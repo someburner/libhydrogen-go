@@ -10,9 +10,10 @@ func main() {
 	fmt.Println("start")
 	fmt.Println(hydro.VersionVerbose())
 	fmt.Println("finish")
-	ExampleKdf()
-	ExampleSecretbox()
-	ExampleSign()
+	ExampleRandom()
+	// ExampleKdf()
+	// ExampleSecretbox()
+	// ExampleSign()
 }
 
 const GOOD_CTX = "goctx123"
@@ -34,6 +35,27 @@ func ExampleKdf() {
 	var id uint64 = 0x0123456789ABCDEF
 	subkey, _ := hydro.KdfDeriveFromKey(32, id, GOOD_CTX, master)
 	fmt.Printf("subkey [%d] %s\n", len(subkey), hydro.Bin2hex(subkey))
+}
+
+func ExampleRandom() {
+	fmt.Println("============= Random =============")
+	fmt.Printf("RandomSeedBytes = %d\n", hydro.RandomSeedBytes)
+
+	fmt.Printf("\n--- RandomU32 ---\n")
+	r32 := hydro.RandomU32()
+	fmt.Printf("U32 -> 0x%X\n", r32)
+
+	fmt.Printf("\n--- RandomUniform ---\n")
+	var upper uint32
+	var i uint
+	for i = 2; i < 31; i++ {
+		upper = 2 << i
+		fmt.Printf("\t(%d)-> 0x%X\n", upper, hydro.RandomUniform(upper))
+	}
+
+	fmt.Printf("\n--- RandomBuf ---\n")
+	buf := hydro.RandomBuf(32)
+	fmt.Printf("bytes[%d]:\n%s\n", len(buf), hydro.Bin2hex(buf))
 }
 
 func ExampleSecretbox() {
