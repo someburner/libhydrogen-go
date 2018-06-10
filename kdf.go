@@ -8,9 +8,9 @@ import "C"
 
 const (
 	KdfContextBytes int = C.hydro_kdf_CONTEXTBYTES
-	KdfKeyBytes int = C.hydro_kdf_KEYBYTES
-	KdfMaxBytes int = C.hydro_kdf_BYTES_MAX
-	KdfMinBytes int = C.hydro_kdf_BYTES_MIN
+	KdfKeyBytes     int = C.hydro_kdf_KEYBYTES
+	KdfMaxBytes     int = C.hydro_kdf_BYTES_MAX
+	KdfMinBytes     int = C.hydro_kdf_BYTES_MIN
 )
 
 func KdfKeygen() []byte {
@@ -27,11 +27,11 @@ func KdfDeriveFromKey(subkey_len int, id uint64, ctx string, master_key []byte) 
 	out := make([]byte, subkey_len)
 
 	exit := int(C.hydro_kdf_derive_from_key(
-			(*C.uchar)(&out[0]),
-			(C.size_t)(subkey_len),
-			(C.uint64_t)(id),
-			C.CString(ctx),
-			(*C.uchar)(&master_key[0])))
+		(*C.uchar)(&out[0]),
+		(C.size_t)(subkey_len),
+		(C.uint64_t)(id),
+		C.CString(ctx),
+		(*C.uchar)(&master_key[0])))
 
 	return out, exit
 }

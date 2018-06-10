@@ -53,7 +53,7 @@ func ExampleSecretbox() {
 	fmt.Printf("CipherText [%d]:\n%s\n", len(ctxt), hydro.Bin2hex(ctxt))
 
 	fmt.Printf("\n--- SecretboxDecrypt ---\n")
-	ptxt, _ :=  hydro.SecretboxDecrypt(ctxt, TEST_MID, GOOD_CTX, sk)
+	ptxt, _ := hydro.SecretboxDecrypt(ctxt, TEST_MID, GOOD_CTX, sk)
 	fmt.Printf("Deciphered plaintext --> \"%s\" <--\n", string(ptxt))
 
 	fmt.Printf("\n--- SecretboxProbeCreate ---\n")
@@ -82,7 +82,7 @@ func ExampleSign() {
 	fmt.Printf("\n--- SignCreate (single) ---\n")
 	fmt.Printf("Create\n")
 	sig, createErr := hydro.SignCreate([]byte(TEST_MSG1), GOOD_CTX, kp.Sk)
-	if (createErr != 0) {
+	if createErr != 0 {
 		panic("SignCreate returned non-zero")
 	}
 	// fmt.Printf("sig[%d]:\n%s\n", len(sig), hydro.Bin2hex(sig))
@@ -102,14 +102,10 @@ func ExampleSign() {
 	ss2 := hydro.NewSignHelper(GOOD_CTX)
 	ss2.Update([]byte(TEST_MSG1))
 	ss2.Update([]byte(TEST_MSG2))
- 	sig1Verified := ss2.FinalVerify(sig1, kp.Pk)
+	sig1Verified := ss2.FinalVerify(sig1, kp.Pk)
 	fmt.Print("sig1Verified = ")
 	fmt.Println(sig1Verified)
 }
-
-
-
-
 
 //
 // eof

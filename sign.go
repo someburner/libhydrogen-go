@@ -11,11 +11,11 @@ import (
 )
 
 const (
-	SignBytes int = C.hydro_sign_BYTES
-	SignContextBytes int = C.hydro_sign_CONTEXTBYTES
+	SignBytes          int = C.hydro_sign_BYTES
+	SignContextBytes   int = C.hydro_sign_CONTEXTBYTES
 	SignPublicKeyBytes int = C.hydro_sign_PUBLICKEYBYTES
 	SignSecretKeyBytes int = C.hydro_sign_SECRETKEYBYTES
-	SignSeedBytes int = C.hydro_sign_SEEDBYTES
+	SignSeedBytes      int = C.hydro_sign_SEEDBYTES
 )
 
 // Reprentation of hydro_sign_keypair
@@ -75,7 +75,7 @@ type SignState struct {
 }
 
 type SignHelper struct {
-	state SignState
+	state   SignState
 	context string
 }
 
@@ -91,7 +91,7 @@ func NewSignHelper(ctx string) SignHelper {
 	st := NewSignState()
 	C.hydro_sign_init(st.inner, C.CString(ctx))
 	return SignHelper{
-		state: st,
+		state:   st,
 		context: ctx,
 	}
 }

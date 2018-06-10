@@ -12,9 +12,9 @@ import (
 
 const (
 	SecretboxContextBytes int = C.hydro_secretbox_CONTEXTBYTES
-	SecretboxHeaderBytes int = C.hydro_secretbox_HEADERBYTES
-	SecretboxKeyBytes int = C.hydro_secretbox_KEYBYTES
-	SecretboxProbeBytes int = C.hydro_secretbox_PROBEBYTES
+	SecretboxHeaderBytes  int = C.hydro_secretbox_HEADERBYTES
+	SecretboxKeyBytes     int = C.hydro_secretbox_KEYBYTES
+	SecretboxProbeBytes   int = C.hydro_secretbox_PROBEBYTES
 )
 
 func SecretboxKeygen() []byte {
@@ -28,7 +28,7 @@ func SecretboxEncrypt(m []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	CheckCtx(ctx, SecretboxContextBytes)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	mlen := len(m)
-	out := make([]byte, mlen + SecretboxHeaderBytes)
+	out := make([]byte, mlen+SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_encrypt(
 		(*C.uchar)(&out[0]),
@@ -46,7 +46,7 @@ func SecretboxDecrypt(c []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	CheckCtx(ctx, SecretboxContextBytes)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
-	out := make([]byte, clen - SecretboxHeaderBytes)
+	out := make([]byte, clen-SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_decrypt(
 		unsafe.Pointer(&out[0]),
@@ -92,8 +92,6 @@ func SecretboxProbeVerify(probe []byte, c []byte, ctx string, sk []byte) bool {
 
 	return bool(result == 0)
 }
-
-
 
 //
 // eof
