@@ -2,6 +2,7 @@ package hydrogen
 
 // #cgo CFLAGS: -I/usr/local/include
 // #cgo LDFLAGS: -L/usr/local/lib -lhydrogen
+// #include <stdlib.h>
 // #include <hydrogen.h>
 import "C"
 
@@ -18,11 +19,24 @@ func init() {
 	fmt.Println("libhydrogen initialized")
 }
 
+func CheckCtx(ctx string, wantlen int) {
+	if len(ctx) != wantlen {
+		panic(fmt.Sprintf("Bad context len. Want (%d), got (%d).", wantlen, len(ctx)))
+	}
+}
+
 // CheckSize checks if the length of a byte slice is equal to the expected length,
 // and panics when this is not the case.
 func CheckSize(buf []byte, expected int, descrip string) {
 	if len(buf) != expected {
-		panic(fmt.Sprintf("Incorrect %s buffer size, expected (%d), got (%d).", descrip, expected, len(buf)))
+		panic(fmt.Sprintf("Invalid \"%s\" size. Want (%d), got (%d).", descrip, expected, len(buf)))
+	}
+}
+
+// CheckIntInRange checks if the size of an integer is between a lower and upper boundaries.
+func CheckIntInRange(n int, min int, max int, descrip string) {
+	if n < min || n > max {
+		panic(fmt.Sprintf("Invalid \"%s\" size. Want (%d - %d), got (%d).", descrip, min, max, n))
 	}
 }
 
@@ -52,6 +66,13 @@ func Bin2hex(bin []byte) string {
 	C.hydro_bin2hex(buf, C.size_t(maxlen), binPtr, C.size_t(len(bin)))
 
 	return C.GoString(buf)
+}
+
+// AlignedSlice returns a memory aligned slice
+func AlignedSlice(size, alignment int) []byte {
+	slice := make([]byte, size+alignment)
+	offset := alignment - int(uintptr(unsafe.Pointer(&slice[0])))%alignment
+	return slice[offset : offset+size]
 }
 
 //
