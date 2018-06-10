@@ -4,36 +4,31 @@ Golang wrapper for [libhydrogen](https://github.com/jedisct1/libhydrogen).
 
 ## Usage
 
-#### If libhydrogen is already installed:
+If libhydrogen is already installed system-wide, just `go get` the project
+and import `libhydrogen-go` like anything else. Otherwise, you may build
+`libhydrogen.a` inside the submodule directory.
 
 ```sh
 go get github.com/someburner/libhydrogen-go
-```
 
-Then import and use in your project. See [example](tests/main.go).
-
-<br>
-
-#### To build the bindings inside `libhydrogen-go`:
-
-```sh
-git clone --recursive https://github.com/someburner/libhydrogen-go
-cd libhydrogen-go
-# build libhydrogen
+# to build inside submodule, or run the examples
+cd github.com/someburner/libhydrogen-go
 make libhydrogen
+
+# go run tests/main.go
+make run
 ```
 
 <br>
 
 ## Examples
 
-TODO: document.
-
-```sh
-# run tests/main.go
-make run
-```
+See [example](tests/main.go).
 
 ## Links
 
 * cgo [reference](https://golang.org/cmd/cgo/)
+
+## Credits
+
+Several methods in `core.go` taken from `libsodium-go`.
