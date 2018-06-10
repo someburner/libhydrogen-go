@@ -12,6 +12,7 @@ func main() {
 	fmt.Println("finish")
 	ExampleKdf()
 	ExampleSecretbox()
+	ExampleSign()
 }
 
 const GOOD_CTX = "goctx123"
@@ -65,8 +66,35 @@ func ExampleSecretbox() {
 	fmt.Println(probeOk)
 }
 
+func ExampleSign() {
+	fmt.Println("============= Sign =============")
+	fmt.Printf("SignBytes = %d\n", hydro.SignBytes)
+	fmt.Printf("SignContextBytes = %d\n", hydro.SignContextBytes)
+	fmt.Printf("SignPublicKeyBytes = %d\n", hydro.SignPublicKeyBytes)
+	fmt.Printf("SignSecretKeyBytes = %d\n", hydro.SignSecretKeyBytes)
+	fmt.Printf("SignSeedBytes = %d\n", hydro.SignSeedBytes)
 
+	fmt.Printf("\n--- SignKeygen ---\n")
+	kp := hydro.SignKeygen()
+	fmt.Printf("pk[%d]:\n%s\n", len(kp.Pk), hydro.Bin2hex(kp.Pk))
+	fmt.Printf("sk[%d]:\n%s\n", len(kp.Sk), hydro.Bin2hex(kp.Sk))
 
+	fmt.Printf("\n--- SignHelper ---\n")
+	fmt.Printf("Create\n")
+	ss1 := hydro.NewSignHelper(GOOD_CTX)
+	ss1.Update([]byte(TEST_MSG1))
+	ss1.Update([]byte(TEST_MSG2))
+	sig1 := ss1.FinalCreate(kp.Sk, false)
+	fmt.Printf("sig1[%d]:\n%s\n", len(sig1), hydro.Bin2hex(sig1))
+
+	fmt.Printf("Verify\n")
+	ss2 := hydro.NewSignHelper(GOOD_CTX)
+	ss2.Update([]byte(TEST_MSG1))
+	ss2.Update([]byte(TEST_MSG2))
+ 	sig1Verified := ss2.FinalVerify(sig1, kp.Pk)
+	fmt.Print("sig1Verified = ")
+	fmt.Println(sig1Verified)
+}
 
 
 
