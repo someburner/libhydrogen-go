@@ -79,7 +79,18 @@ func ExampleSign() {
 	fmt.Printf("pk[%d]:\n%s\n", len(kp.Pk), hydro.Bin2hex(kp.Pk))
 	fmt.Printf("sk[%d]:\n%s\n", len(kp.Sk), hydro.Bin2hex(kp.Sk))
 
-	fmt.Printf("\n--- SignHelper ---\n")
+	fmt.Printf("\n--- SignCreate (single) ---\n")
+	sig, createErr := hydro.SignCreate([]byte(TEST_MSG1), GOOD_CTX, kp.Sk)
+	if (createErr != 0) {
+		panic("SignCreate returned non-zero")
+	}
+	// fmt.Printf("sig[%d]:\n%s\n", len(sig), hydro.Bin2hex(sig))
+
+	sigVerified := hydro.SignVerify(sig, []byte(TEST_MSG1), GOOD_CTX, kp.Pk)
+	fmt.Print("sigVerified = ")
+	fmt.Println(sigVerified)
+
+	fmt.Printf("\n--- SignHelper (multi) ---\n")
 	fmt.Printf("Create\n")
 	ss1 := hydro.NewSignHelper(GOOD_CTX)
 	ss1.Update([]byte(TEST_MSG1))

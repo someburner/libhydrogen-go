@@ -35,7 +35,40 @@ func SignKeygen() SignKeypair {
 }
 
 // int hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen, const char ctx[hydro_sign_CONTEXTBYTES], const uint8_t sk[hydro_sign_SECRETKEYBYTES]);
+func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
+	CheckCtx(ctx, SignContextBytes)
+	CheckSize(sk, SignSecretKeyBytes, "sign sk")
+	mlen := len(m)
+	out := make([]byte, SignBytes)
+
+	// Returns 0 on success
+	exit := int(C.hydro_sign_create(
+		(*C.uchar)(&out[0]),
+		unsafe.Pointer(&m[0]),
+		(C.size_t)(mlen),
+		C.CString(ctx),
+		(*C.uchar)(&sk[0])))
+
+	return out, exit
+}
+
 // int hydro_sign_verify(const uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen, const char ctx[hydro_sign_CONTEXTBYTES], const uint8_t pk[hydro_sign_PUBLICKEYBYTES]) _hydro_attr_warn_unused_result_;
+func SignVerify(sig []byte, m []byte, ctx string, pk []byte) bool {
+	CheckSize(sig, SignBytes, "sign sig")
+	CheckCtx(ctx, SignContextBytes)
+	CheckSize(pk, SignPublicKeyBytes, "sign pk")
+	mlen := len(m)
+
+	// Returns 0 on success
+	exit := int(C.hydro_sign_verify(
+		(*C.uchar)(&sig[0]),
+		unsafe.Pointer(&m[0]),
+		(C.size_t)(mlen),
+		C.CString(ctx),
+		(*C.uchar)(&pk[0])))
+
+	return bool(exit == 0)
+}
 
 type SignState struct {
 	inner *C.hydro_sign_state
@@ -74,7 +107,7 @@ func (s *SignHelper) Update(m []byte) {
 
 // int hydro_sign_final_create(hydro_sign_state *state, uint8_t csig[hydro_sign_BYTES], const uint8_t sk[hydro_sign_SECRETKEYBYTES]);
 func (s *SignHelper) FinalCreate(sk []byte, wipe bool) []byte {
-	CheckSize(sk, SignSecretKeyBytes, "sk")
+	CheckSize(sk, SignSecretKeyBytes, "sign sk")
 	out := make([]byte, SignBytes)
 	C.hydro_sign_final_create(
 		s.state.inner,
@@ -85,8 +118,8 @@ func (s *SignHelper) FinalCreate(sk []byte, wipe bool) []byte {
 
 // int hydro_sign_final_verify(hydro_sign_state *state, const uint8_t csig[hydro_sign_BYTES], const uint8_t pk[hydro_sign_PUBLICKEYBYTES]) _hydro_attr_warn_unused_result_;
 func (s *SignHelper) FinalVerify(sig []byte, pk []byte) bool {
-	CheckSize(sig, SignBytes, "sig")
-	CheckSize(pk, SignPublicKeyBytes, "pk")
+	CheckSize(sig, SignBytes, "sign sig")
+	CheckSize(pk, SignPublicKeyBytes, "sign pk")
 	exit := int(C.hydro_sign_final_verify(
 		s.state.inner,
 		(*C.uchar)(&sig[0]),
