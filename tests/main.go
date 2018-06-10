@@ -188,24 +188,24 @@ func ExampleSign() {
 
 	fmt.Printf("\n--- SignKeygen ---\n")
 	kp := hydro.SignKeygen()
-	fmt.Printf("pk[%d]:\n%s\n", len(kp.Pk), hydro.Bin2hex(kp.Pk))
-	fmt.Printf("sk[%d]:\n%s\n", len(kp.Sk), hydro.Bin2hex(kp.Sk))
+	fmt.Printf("[Pk] -> %s\n", hydro.Bin2hex(kp.Pk()))
+	fmt.Printf("[Sk] -> %s\n", hydro.Bin2hex(kp.Sk()))
 
 	fmt.Printf("\n--- SignKeygenDeterministic ---\n")
 	seed := hydro.RandomBuf(hydro.SignSeedBytes)
 	kpDet := hydro.SignKeygenDeterministic(seed)
-	fmt.Printf("pk[%d]:\n%s\n", len(kpDet.Pk), hydro.Bin2hex(kpDet.Pk))
-	fmt.Printf("sk[%d]:\n%s\n", len(kpDet.Sk), hydro.Bin2hex(kpDet.Sk))
+	fmt.Printf("[Pk] -> %s\n", hydro.Bin2hex(kpDet.Pk()))
+	fmt.Printf("[Sk] -> %s\n", hydro.Bin2hex(kpDet.Sk()))
 
 	fmt.Printf("\n--- SignCreate (single) ---\n")
 	fmt.Printf("Create\n")
-	sig, createErr := hydro.SignCreate([]byte(TEST_MSG1), GOOD_CTX, kp.Sk)
+	sig, createErr := hydro.SignCreate([]byte(TEST_MSG1), GOOD_CTX, kp.Sk())
 	if createErr != 0 {
 		panic("SignCreate returned non-zero")
 	}
 	// fmt.Printf("sig[%d]:\n%s\n", len(sig), hydro.Bin2hex(sig))
 	fmt.Printf("Verify\n")
-	sigVerified := hydro.SignVerify(sig, []byte(TEST_MSG1), GOOD_CTX, kp.Pk)
+	sigVerified := hydro.SignVerify(sig, []byte(TEST_MSG1), GOOD_CTX, kp.Pk())
 	fmt.Print("sigVerified = ")
 	fmt.Println(sigVerified)
 
@@ -214,13 +214,13 @@ func ExampleSign() {
 	ss1 := hydro.NewSignHelper(GOOD_CTX)
 	ss1.Update([]byte(TEST_MSG1))
 	ss1.Update([]byte(TEST_MSG2))
-	sig1 := ss1.FinalCreate(kp.Sk, false)
+	sig1 := ss1.FinalCreate(kp.Sk(), false)
 	// fmt.Printf("sig1[%d]:\n%s\n", len(sig1), hydro.Bin2hex(sig1))
 	fmt.Printf("Verify\n")
 	ss2 := hydro.NewSignHelper(GOOD_CTX)
 	ss2.Update([]byte(TEST_MSG1))
 	ss2.Update([]byte(TEST_MSG2))
-	sig1Verified := ss2.FinalVerify(sig1, kp.Pk)
+	sig1Verified := ss2.FinalVerify(sig1, kp.Pk())
 	fmt.Print("sig1Verified = ")
 	fmt.Println(sig1Verified)
 }

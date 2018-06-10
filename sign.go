@@ -20,31 +20,32 @@ const (
 
 // Reprentation of hydro_sign_keypair
 type SignKeypair struct {
-	Pk []byte // uint8_t pk[hydro_sign_PUBLICKEYBYTES];
-	Sk []byte // uint8_t sk[hydro_sign_SECRETKEYBYTES];
-} // hydro_sign_keypair
+	inner *C.hydro_sign_keypair
+}
+func (kp * SignKeypair) Pk() []byte {
+	return C.GoBytes(unsafe.Pointer(&kp.inner.pk), C.hydro_sign_PUBLICKEYBYTES)
+}
+func (kp * SignKeypair) Sk() []byte {
+	return C.GoBytes(unsafe.Pointer(&kp.inner.sk), C.hydro_sign_SECRETKEYBYTES)
+}
 
+/* --------------------------------- Keygen --------------------------------- */
 // void hydro_sign_keygen(hydro_sign_keypair *kp);
 func SignKeygen() SignKeypair {
-	kp := new(C.struct_hydro_sign_keypair)
-	C.hydro_sign_keygen(kp)
-	return SignKeypair{
-		Pk: C.GoBytes(unsafe.Pointer(&kp.pk), C.hydro_sign_PUBLICKEYBYTES),
-		Sk: C.GoBytes(unsafe.Pointer(&kp.sk), C.hydro_sign_SECRETKEYBYTES),
-	}
+	cSignKeypair := new(C.struct_hydro_sign_keypair)
+	C.hydro_sign_keygen(cSignKeypair)
+	return SignKeypair{cSignKeypair}
 }
 
 // void hydro_sign_keygen_deterministic(hydro_sign_keypair *kp, const uint8_t seed[hydro_sign_SEEDBYTES]);
 func SignKeygenDeterministic(seed []byte) SignKeypair {
 	CheckSize(seed, SignSeedBytes, "seed")
-	kp := new(C.struct_hydro_sign_keypair)
-	C.hydro_sign_keygen_deterministic(kp, (*C.uchar)(&seed[0]))
-	return SignKeypair{
-		Pk: C.GoBytes(unsafe.Pointer(&kp.pk), C.hydro_sign_PUBLICKEYBYTES),
-		Sk: C.GoBytes(unsafe.Pointer(&kp.sk), C.hydro_sign_SECRETKEYBYTES),
-	}
+	cSignKeypair := new(C.struct_hydro_sign_keypair)
+	C.hydro_sign_keygen_deterministic(cSignKeypair, (*C.uchar)(&seed[0]))
+	return SignKeypair{cSignKeypair}
 }
 
+/* --------------------------------- Single --------------------------------- */
 // int hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen, const char ctx[hydro_sign_CONTEXTBYTES], const uint8_t sk[hydro_sign_SECRETKEYBYTES]);
 func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 	CheckCtx(ctx, SignContextBytes)
@@ -81,6 +82,7 @@ func SignVerify(sig []byte, m []byte, ctx string, pk []byte) bool {
 	return bool(exit == 0)
 }
 
+/* --------------------------------- Multi ---------------------------------- */
 type SignState struct {
 	inner *C.hydro_sign_state
 }
