@@ -36,12 +36,19 @@ func ExampleHash() {
 	sk := hydro.HashKeygen()
 	fmt.Printf("sk [%d] %s\n", len(sk), hydro.Bin2hex(sk))
 
-	fmt.Printf("\n--- HashHash ---\n")
-	hash, res := hydro.HashHash(hydro.HashBytes, []byte(TEST_MSG1), GOOD_CTX, sk)
-	if res != 0 {
+	fmt.Printf("\n--- HashHash (w/ key) ---\n")
+	h1, r1 := hydro.HashHash(hydro.HashBytes, []byte(TEST_MSG1), GOOD_CTX, sk)
+	if r1 != 0 {
 		panic("HashHash returned non-zero")
 	}
-	fmt.Printf("hash [%d] %s\n", len(hash), hydro.Bin2hex(hash))
+	fmt.Printf("h1 [%d] %s\n", len(h1), hydro.Bin2hex(h1))
+
+	fmt.Printf("\n--- HashHash (w/o key) ---\n")
+	h2, r2 := hydro.HashHash(hydro.HashBytes, []byte(TEST_MSG1), GOOD_CTX, nil)
+	if r2 != 0 {
+		panic("HashHash returned non-zero")
+	}
+	fmt.Printf("h2 [%d] %s\n", len(h2), hydro.Bin2hex(h2))
 }
 
 func ExampleKdf() {
