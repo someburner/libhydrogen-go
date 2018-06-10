@@ -12,6 +12,7 @@ func main() {
 	fmt.Println("finish")
 	ExampleHash()
 	ExampleKdf()
+	ExamplePwHash()
 	ExampleRandom()
 	ExampleSecretbox()
 	ExampleSign()
@@ -25,7 +26,7 @@ const TEST_MSG1 = "testing 123"
 const TEST_MSG2 = "testing abc"
 
 func ExampleHash() {
-	fmt.Println("============= Hash =============")
+	fmt.Printf("\n============= Hash =============\n")
 	fmt.Printf("HashBytes = %d\n", hydro.HashBytes)
 	fmt.Printf("HashBytesMax = %d\n", hydro.HashBytesMax)
 	fmt.Printf("HashBytesMin = %d\n", hydro.HashBytesMin)
@@ -52,21 +53,35 @@ func ExampleHash() {
 }
 
 func ExampleKdf() {
-	fmt.Println("============= Kdf =============")
+	fmt.Printf("\n============= Kdf =============\n")
 	fmt.Printf("KdfContextBytes = %d\n", hydro.KdfContextBytes)
 	fmt.Printf("KdfKeyBytes = %d\n", hydro.KdfKeyBytes)
 	fmt.Printf("KdfMaxBytes = %d\n", hydro.KdfMaxBytes)
 	fmt.Printf("KdfMinBytes = %d\n", hydro.KdfMinBytes)
-	fmt.Println("KdfKeygen:")
+
+	fmt.Printf("\n--- KdfKeygen ---\n")
 	master := hydro.KdfKeygen()
 	fmt.Printf("master [%d] %s\n", len(master), hydro.Bin2hex(master))
+
+	fmt.Printf("\n--- KdfDeriveFromKey ---\n")
 	var id uint64 = 0x0123456789ABCDEF
 	subkey, _ := hydro.KdfDeriveFromKey(32, id, GOOD_CTX, master)
 	fmt.Printf("subkey [%d] %s\n", len(subkey), hydro.Bin2hex(subkey))
 }
 
+func ExamplePwHash() {
+	fmt.Printf("\n============= PwHash =============\n")
+	fmt.Printf("PwHashContextBytes = %d\n", hydro.PwHashContextBytes)
+	fmt.Printf("PwHashMasterKeyBytes = %d\n", hydro.PwHashMasterKeyBytes)
+	fmt.Printf("PwHashStoredBytes = %d\n", hydro.PwHashStoredBytes)
+
+	fmt.Printf("\n--- PwHashKeygen ---\n")
+	master := hydro.PwHashKeygen()
+	fmt.Printf("master [%d] %s\n", len(master), hydro.Bin2hex(master))
+}
+
 func ExampleRandom() {
-	fmt.Println("============= Random =============")
+	fmt.Printf("\n============= Random =============\n")
 	fmt.Printf("RandomSeedBytes = %d\n", hydro.RandomSeedBytes)
 
 	fmt.Printf("\n--- RandomU32 ---\n")
@@ -87,7 +102,7 @@ func ExampleRandom() {
 }
 
 func ExampleSecretbox() {
-	fmt.Println("============= Secretbox =============")
+	fmt.Printf("\n============= Secretbox =============\n")
 	fmt.Printf("SecretboxContextBytes = %d\n", hydro.SecretboxContextBytes)
 	fmt.Printf("SecretboxHeaderBytes = %d\n", hydro.SecretboxHeaderBytes)
 	fmt.Printf("SecretboxKeyBytes = %d\n", hydro.SecretboxKeyBytes)
@@ -117,7 +132,7 @@ func ExampleSecretbox() {
 }
 
 func ExampleSign() {
-	fmt.Println("============= Sign =============")
+	fmt.Printf("\n============= Sign =============\n")
 	fmt.Printf("SignBytes = %d\n", hydro.SignBytes)
 	fmt.Printf("SignContextBytes = %d\n", hydro.SignContextBytes)
 	fmt.Printf("SignPublicKeyBytes = %d\n", hydro.SignPublicKeyBytes)
