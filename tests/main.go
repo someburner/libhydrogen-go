@@ -9,13 +9,14 @@ import (
 func main() {
 	fmt.Println("start")
 	fmt.Println(hydro.VersionVerbose())
-	fmt.Println("finish")
 	ExampleHash()
 	ExampleKdf()
+	ExampleKx()
 	ExamplePwHash()
 	ExampleRandom()
 	ExampleSecretbox()
 	ExampleSign()
+	fmt.Println("finish")
 }
 
 const GOOD_CTX = "goctx123"
@@ -67,6 +68,52 @@ func ExampleKdf() {
 	var id uint64 = 0x0123456789ABCDEF
 	subkey, _ := hydro.KdfDeriveFromKey(32, id, GOOD_CTX, master)
 	fmt.Printf("subkey [%d] %s\n", len(subkey), hydro.Bin2hex(subkey))
+}
+
+func ExampleKxN() {
+	fmt.Printf("\n============= Kx (N) =============\n")
+	// long-term server kp
+	server_kp := hydro.KxKeygen()
+
+	fmt.Printf("\n--- KxN1 (client) ---\n")
+	clientSessionKp,pkt1,ok := hydro.KxN1(nil, server_kp.Pk())
+	if ok != 0 {
+		panic("KxN1 returned non-zero")
+	}
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(clientSessionKp.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(clientSessionKp.Tx()))
+	fmt.Printf("[Pkt1] -> %s\n", hydro.Bin2hex(pkt1))
+
+	fmt.Printf("\n--- KxN2 (server) ---\n")
+	serverSessionKp,ok := hydro.KxN2(pkt1, nil, server_kp)
+	if ok != 0 {
+		panic("KxN2 returned non-zero")
+	}
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(serverSessionKp.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(serverSessionKp.Tx()))
+}
+
+func ExampleKxKK() {
+	fmt.Printf("\n============= Kx (KK) =============\n")
+}
+
+func ExampleKxXX() {
+	fmt.Printf("\n============= Kx (XX) =============\n")
+}
+
+func ExampleKx() {
+	fmt.Printf("\n============= Kx =============\n")
+	fmt.Printf("KxPublicKeyBytes = %d\n", hydro.KxPublicKeyBytes)
+	fmt.Printf("KxSecretKeyBytes = %d\n", hydro.KxSecretKeyBytes)
+	fmt.Printf("KxSessionKeyBytes = %d\n", hydro.KxSessionKeyBytes)
+	fmt.Printf("KxSeedBytes = %d\n", hydro.KxSeedBytes)
+
+	fmt.Printf("\n--- KxKeygen ---\n")
+	kp := hydro.KxKeygen()
+	fmt.Printf("[Pk] -> %s\n", hydro.Bin2hex(kp.Pk()))
+	fmt.Printf("[Sk] -> %s\n", hydro.Bin2hex(kp.Sk()))
+
+	ExampleKxN()
 }
 
 func ExamplePwHash() {
