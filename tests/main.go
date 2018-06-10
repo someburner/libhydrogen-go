@@ -10,10 +10,10 @@ func main() {
 	fmt.Println("start")
 	fmt.Println(hydro.VersionVerbose())
 	fmt.Println("finish")
+	ExampleKdf()
 	ExampleRandom()
-	// ExampleKdf()
-	// ExampleSecretbox()
-	// ExampleSign()
+	ExampleSecretbox()
+	ExampleSign()
 }
 
 const GOOD_CTX = "goctx123"
@@ -100,6 +100,12 @@ func ExampleSign() {
 	kp := hydro.SignKeygen()
 	fmt.Printf("pk[%d]:\n%s\n", len(kp.Pk), hydro.Bin2hex(kp.Pk))
 	fmt.Printf("sk[%d]:\n%s\n", len(kp.Sk), hydro.Bin2hex(kp.Sk))
+
+	fmt.Printf("\n--- SignKeygenDeterministic ---\n")
+	seed := hydro.RandomBuf(hydro.SignSeedBytes)
+	kpDet := hydro.SignKeygenDeterministic(seed)
+	fmt.Printf("pk[%d]:\n%s\n", len(kpDet.Pk), hydro.Bin2hex(kpDet.Pk))
+	fmt.Printf("sk[%d]:\n%s\n", len(kpDet.Sk), hydro.Bin2hex(kpDet.Sk))
 
 	fmt.Printf("\n--- SignCreate (single) ---\n")
 	fmt.Printf("Create\n")

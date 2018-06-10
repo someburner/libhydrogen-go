@@ -34,6 +34,17 @@ func SignKeygen() SignKeypair {
 	}
 }
 
+// void hydro_sign_keygen_deterministic(hydro_sign_keypair *kp, const uint8_t seed[hydro_sign_SEEDBYTES]);
+func SignKeygenDeterministic(seed []byte) SignKeypair {
+	CheckSize(seed, SignSeedBytes, "seed")
+	kp := new(C.struct_hydro_sign_keypair)
+	C.hydro_sign_keygen_deterministic(kp, (*C.uchar)(&seed[0]))
+	return SignKeypair{
+		Pk: C.GoBytes(unsafe.Pointer(&kp.pk), C.hydro_sign_PUBLICKEYBYTES),
+		Sk: C.GoBytes(unsafe.Pointer(&kp.sk), C.hydro_sign_SECRETKEYBYTES),
+	}
+}
+
 // int hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen, const char ctx[hydro_sign_CONTEXTBYTES], const uint8_t sk[hydro_sign_SECRETKEYBYTES]);
 func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 	CheckCtx(ctx, SignContextBytes)
