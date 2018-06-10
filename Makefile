@@ -13,7 +13,7 @@ fmt:
 	$(SHELL) scripts/cmd.sh "fmt"
 
 test:
-	env CGO_ENABLED=1 go test
+	env CGO_ENABLED=1 go test *_test.go
 
 run:
 	env CGO_ENABLED=1 go run tests/main.go

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	hydro "github.com/someburner/libhydrogen-go"
+	"testing"
 )
 
 func main() {

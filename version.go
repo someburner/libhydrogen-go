@@ -20,6 +20,10 @@ func VersionMinor() int {
 	return C.HYDRO_VERSION_MINOR
 }
 
+func VersionPair() (int, int) {
+	return VersionMajor(), VersionMinor()
+}
+
 func VersionString() string {
 	return fmt.Sprintf("%d.%d", VersionMajor(), VersionMinor())
 }
