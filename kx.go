@@ -122,7 +122,7 @@ func KxN2(pkt1 []byte, psk []byte, server_kp KxKeyPair) (KxSessionKeyPair, int) 
 	if psk != nil {
 		CheckSize(psk, KxPskBytes, "psk")
 	}
-	CheckSize(pkt1, KxNPacket1Bytes, "n2 - pkt1")
+	CheckSize(pkt1, KxNPacket1Bytes, "n2-pkt1")
 	cSessionKp := new(C.struct_hydro_kx_session_keypair)
 
 	var exit int
@@ -150,7 +150,7 @@ func KxN2(pkt1 []byte, psk []byte, server_kp KxKeyPair) (KxSessionKeyPair, int) 
 // Prototype:
 // int hydro_kx_kk_1(hydro_kx_state *state, uint8_t packet1[hydro_kx_KK_PACKET1BYTES], const uint8_t peer_static_pk[hydro_kx_PUBLICKEYBYTES], const hydro_kx_keypair *static_kp);
 func KxKK1(st_client KxState, server_pubkey []byte, client_kp KxKeyPair) ([]byte, int) {
-	CheckSize(server_pubkey, KxPublicKeyBytes, "kk1 - server_pubkey")
+	CheckSize(server_pubkey, KxPublicKeyBytes, "kk1-server_pubkey")
 	pkt1 := make([]byte, KxKKPacket1Bytes)
 
 	exit := int(C.hydro_kx_kk_1(
@@ -169,8 +169,8 @@ func KxKK1(st_client KxState, server_pubkey []byte, client_kp KxKeyPair) ([]byte
 // Prototype:
 // int hydro_kx_kk_2(hydro_kx_session_keypair *kp, uint8_t packet2[hydro_kx_KK_PACKET2BYTES], const uint8_t packet1[hydro_kx_KK_PACKET1BYTES], const uint8_t peer_static_pk[hydro_kx_PUBLICKEYBYTES], const hydro_kx_keypair *static_kp);
 func KxKK2(pkt1 []byte, client_pubkey []byte, server_kp KxKeyPair) (KxSessionKeyPair, []byte, int) {
-	CheckSize(pkt1, KxKKPacket1Bytes, "kk2 - pkt1 bytes")
-	CheckSize(client_pubkey, KxPublicKeyBytes, "kk2 - client_pubkey")
+	CheckSize(pkt1, KxKKPacket1Bytes, "kk2-pkt1")
+	CheckSize(client_pubkey, KxPublicKeyBytes, "kk2-client_pubkey")
 	pkt2 := make([]byte, KxKKPacket2Bytes)
 	cSessionKp := new(C.struct_hydro_kx_session_keypair)
 
@@ -190,8 +190,8 @@ func KxKK2(pkt1 []byte, client_pubkey []byte, server_kp KxKeyPair) (KxSessionKey
 // Prototype:
 // int hydro_kx_kk_3(hydro_kx_state *state, hydro_kx_session_keypair *kp, const uint8_t packet2[hydro_kx_KK_PACKET2BYTES], const uint8_t peer_static_pk[hydro_kx_PUBLICKEYBYTES]);
 func KxKK3(st_client KxState, pkt2 []byte, server_pubkey []byte) (KxSessionKeyPair, int) {
-	CheckSize(pkt2, KxKKPacket1Bytes, "kk3 - pkt2 bytes")
-	CheckSize(server_pubkey, KxPublicKeyBytes, "kk3 - server_pubkey")
+	CheckSize(pkt2, KxKKPacket1Bytes, "kk3-pkt2 bytes")
+	CheckSize(server_pubkey, KxPublicKeyBytes, "kk3-server_pubkey")
 	cSessionKp := new(C.struct_hydro_kx_session_keypair)
 
 	exit := int(C.hydro_kx_kk_3(
@@ -209,6 +209,133 @@ type KxHelperKK struct {
 }
 
 /* -------------------------------- Kx (XX) --------------------------------- */
+// KxXX1: Client -> Server
+// * Returns pkt1 slice, 0/-1 (success/error)
+// Prototype:
+// int hydro_kx_xx_1(hydro_kx_state *state, uint8_t packet1[hydro_kx_XX_PACKET1BYTES], const uint8_t psk[hydro_kx_PSKBYTES]);
+func KxXX1(st_client KxState, psk []byte) ([]byte, int) {
+	if psk != nil {
+		CheckSize(psk, KxPskBytes, "psk")
+	}
+	pkt1 := make([]byte, KxXXPacket1Bytes)
+
+	var exit int
+	if psk != nil {
+		exit = int(C.hydro_kx_xx_1(
+			st_client.inner,
+			(*C.uchar)(&pkt1[0]),
+			(*C.uchar)(&psk[0])))
+	} else {
+		exit = int(C.hydro_kx_xx_1(
+			st_client.inner,
+			(*C.uchar)(&pkt1[0]),
+			nil))
+	}
+
+	return pkt1, exit
+}
+
+// KxXX2: Server -> Client
+// * Returns pkt2 slice, 0/-1 (success/error)
+// Prototype:
+// int hydro_kx_xx_2(hydro_kx_state *state, uint8_t packet2[hydro_kx_XX_PACKET2BYTES], const uint8_t packet1[hydro_kx_XX_PACKET1BYTES], const uint8_t psk[hydro_kx_PSKBYTES], const hydro_kx_keypair *static_kp);
+func KxXX2(st_server KxState, pkt1 []byte, server_kp KxKeyPair, psk []byte) ([]byte, int) {
+	if psk != nil {
+		CheckSize(psk, KxPskBytes, "psk")
+	}
+	CheckSize(pkt1, KxXXPacket1Bytes, "xx2-pkt1")
+	pkt2 := make([]byte, KxXXPacket2Bytes)
+
+	var exit int
+	if psk != nil {
+		exit = int(C.hydro_kx_xx_2(
+			st_server.inner,
+			(*C.uchar)(&pkt2[0]),
+			(*C.uchar)(&pkt1[0]),
+			(*C.uchar)(&psk[0]),
+			server_kp.inner))
+	} else {
+		exit = int(C.hydro_kx_xx_2(
+			st_server.inner,
+			(*C.uchar)(&pkt2[0]),
+			(*C.uchar)(&pkt1[0]),
+			nil,
+			server_kp.inner))
+	}
+
+	return pkt2, exit
+}
+
+// KxXX3: Client -> Server
+// * Returns client session pair, pkt3 slice, peer publickey, 0/-1 (success/error)
+// Prototype:
+// int hydro_kx_xx_3(hydro_kx_state *state, hydro_kx_session_keypair *kp, uint8_t packet3[hydro_kx_XX_PACKET3BYTES], uint8_t peer_static_pk[hydro_kx_PUBLICKEYBYTES], const uint8_t packet2[hydro_kx_XX_PACKET2BYTES], const uint8_t psk[hydro_kx_PSKBYTES], const hydro_kx_keypair *static_kp);
+func KxXX3(st_client KxState, pkt2 []byte, client_kp KxKeyPair, psk []byte) (KxSessionKeyPair, []byte, []byte, int) {
+	if psk != nil {
+		CheckSize(psk, KxPskBytes, "psk")
+	}
+	CheckSize(pkt2, KxXXPacket2Bytes, "xx3-pkt2")
+	cSessionKpClient := new(C.struct_hydro_kx_session_keypair)
+	pkt3 := make([]byte, KxXXPacket3Bytes)
+	peer_pk := make([]byte, KxPublicKeyBytes)
+
+	var exit int
+	if psk != nil {
+		exit = int(C.hydro_kx_xx_3(
+			st_client.inner,
+			cSessionKpClient,
+			(*C.uchar)(&pkt3[0]),
+			(*C.uchar)(&peer_pk[0]),
+			(*C.uchar)(&pkt2[0]),
+			(*C.uchar)(&psk[0]),
+			client_kp.inner))
+	} else {
+		exit = int(C.hydro_kx_xx_3(
+			st_client.inner,
+			cSessionKpClient,
+			(*C.uchar)(&pkt3[0]),
+			(*C.uchar)(&peer_pk[0]),
+			(*C.uchar)(&pkt2[0]),
+			nil,
+			client_kp.inner))
+	}
+
+	return KxSessionKeyPair{cSessionKpClient}, pkt3, peer_pk, exit
+}
+
+// KxXX4: Server
+// * Returns server session pair, peer publickey, 0/-1 (success/error)
+// Prototype:
+// int hydro_kx_xx_4(hydro_kx_state *state, hydro_kx_session_keypair *kp, uint8_t peer_static_pk[hydro_kx_PUBLICKEYBYTES], const uint8_t packet3[hydro_kx_XX_PACKET3BYTES], const uint8_t psk[hydro_kx_PSKBYTES]);
+func KxXX4(st_server KxState, pkt3 []byte, psk []byte) (KxSessionKeyPair, []byte, int) {
+	if psk != nil {
+		CheckSize(psk, KxPskBytes, "xx4-psk")
+	}
+	CheckSize(pkt3, KxXXPacket3Bytes, "xx4-pkt3")
+	cSessionKpServer := new(C.struct_hydro_kx_session_keypair)
+	peer_pk := make([]byte, KxPublicKeyBytes)
+
+	var exit int
+	if psk != nil {
+		exit = int(C.hydro_kx_xx_4(
+			st_server.inner,
+			cSessionKpServer,
+			(*C.uchar)(&peer_pk[0]),
+			(*C.uchar)(&pkt3[0]),
+			(*C.uchar)(&psk[0])))
+	} else {
+		exit = int(C.hydro_kx_xx_4(
+			st_server.inner,
+			cSessionKpServer,
+			(*C.uchar)(&peer_pk[0]),
+			(*C.uchar)(&pkt3[0]),
+			nil))
+	}
+
+	return KxSessionKeyPair{cSessionKpServer}, peer_pk, exit
+}
+
+
 type KxHelperXX struct {
 	state   KxState
 	context string

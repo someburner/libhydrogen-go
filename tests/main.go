@@ -76,21 +76,23 @@ func ExampleKxN() {
 	server_kp := hydro.KxKeygen()
 
 	fmt.Printf("\n--- KxN1 (client) ---\n")
-	clientSessionKp,pkt1,ok := hydro.KxN1(nil, server_kp.Pk())
+	sessionKpClient, pkt1, ok := hydro.KxN1(nil, server_kp.Pk())
 	if ok != 0 {
 		panic("KxN1 returned non-zero")
 	}
-	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(clientSessionKp.Rx()))
-	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(clientSessionKp.Tx()))
-	fmt.Printf("[Pkt1] -> %s\n", hydro.Bin2hex(pkt1))
+	fmt.Printf("sessionKpClient\n")
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpClient.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpClient.Tx()))
+	fmt.Printf("[pkt1] -> %s\n", hydro.Bin2hex(pkt1))
 
 	fmt.Printf("\n--- KxN2 (server) ---\n")
-	serverSessionKp,ok := hydro.KxN2(pkt1, nil, server_kp)
+	sessionKpServer, ok := hydro.KxN2(pkt1, nil, server_kp)
 	if ok != 0 {
 		panic("KxN2 returned non-zero")
 	}
-	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(serverSessionKp.Rx()))
-	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(serverSessionKp.Tx()))
+	fmt.Printf("sessionKpServer\n")
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpServer.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpServer.Tx()))
 }
 
 func ExampleKxKK() {
@@ -99,36 +101,88 @@ func ExampleKxKK() {
 	client_kp := hydro.KxKeygen()
 	server_kp := hydro.KxKeygen()
 
-	fmt.Printf("\n--- KxKK1 ---\n")
+	fmt.Printf("\n--- KxKK1 (client) ---\n")
 	client_st := hydro.NewKxState()
 	pkt1, kk1res := hydro.KxKK1(client_st, server_kp.Pk(), client_kp)
 	if kk1res != 0 {
 		panic("KxKK1 returned non-zero")
 	}
-	fmt.Printf("[Pkt1] -> %s\n", hydro.Bin2hex(pkt1))
+	fmt.Printf("[pkt1] -> %s\n", hydro.Bin2hex(pkt1))
 
-	fmt.Printf("\n--- KxKK2 ---\n")
-	serverSessionKp, pkt2, kk2res := hydro.KxKK2(pkt1, client_kp.Pk(), server_kp)
+	fmt.Printf("\n--- KxKK2 (server) ---\n")
+	sessionKpServer, pkt2, kk2res := hydro.KxKK2(pkt1, client_kp.Pk(), server_kp)
 	if kk2res != 0 {
 		panic("KxKK2 returned non-zero")
 	}
-	fmt.Printf("serverSessionKp\n")
-	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(serverSessionKp.Rx()))
-	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(serverSessionKp.Tx()))
-	fmt.Printf("[Pkt2] -> %s\n", hydro.Bin2hex(pkt2))
+	fmt.Printf("sessionKpServer\n")
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpServer.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpServer.Tx()))
+	fmt.Printf("\n[pkt2] -> %s\n", hydro.Bin2hex(pkt2))
 
-	fmt.Printf("\n--- KxKK3 ---\n")
-	clientSessionKp, kk3res := hydro.KxKK3(client_st, pkt2, server_kp.Pk())
+	fmt.Printf("\n--- KxKK3 (client) ---\n")
+	sessionKpClient, kk3res := hydro.KxKK3(client_st, pkt2, server_kp.Pk())
 	if kk3res != 0 {
 		panic("KxKK3 returned non-zero")
 	}
-	fmt.Printf("clientSessionKp\n")
-	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(clientSessionKp.Rx()))
-	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(clientSessionKp.Tx()))
+	fmt.Printf("sessionKpClient\n")
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpClient.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpClient.Tx()))
 }
 
 func ExampleKxXX() {
 	fmt.Printf("\n============= Kx (XX) =============\n")
+	// long-term client/server keypairs
+	client_kp := hydro.KxKeygen()
+	server_kp := hydro.KxKeygen()
+
+	fmt.Printf("\n--- KxXX1 (client) ---\n")
+	// init client st
+	client_st := hydro.NewKxState()
+	pkt1, xx1res := hydro.KxXX1(client_st, nil)
+	if xx1res != 0 {
+		panic("KxXX1 returned non-zero")
+	}
+	fmt.Printf("\n[pkt1] -> %s\n", hydro.Bin2hex(pkt1))
+	//
+	// pkt1 --> server
+	//
+	fmt.Printf("\n--- KxXX2 (server) ---\n")
+	// init server st
+	server_st := hydro.NewKxState()
+	pkt2, xx2res := hydro.KxXX2(server_st, pkt1, server_kp, nil)
+	if xx2res != 0 {
+		panic("KxXX2 returned non-zero")
+	}
+	fmt.Printf("\n[pkt2] -> %s\n", hydro.Bin2hex(pkt2))
+	//
+	// pkt2 -> client
+	//
+	fmt.Printf("\n--- KxXX3 (client) ---\n")
+	// func KxXX3(st_client KxState, pkt2 []byte, client_kp KxKeyPair, psk []byte) (KxSessionKeyPair, []byte, []byte, int)
+	sessionKpClient, pkt3, peerPkClient, xx3res := hydro.KxXX3(client_st, pkt2, client_kp, nil)
+	if xx3res != 0 {
+		panic("KxXX3 returned non-zero")
+	}
+	fmt.Printf("sessionKpClient:\n")
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpClient.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpClient.Tx()))
+	fmt.Printf("[peerPk] -> %s\n", hydro.Bin2hex(peerPkClient))
+	fmt.Printf("\n[pkt3] -> %s\n", hydro.Bin2hex(pkt3))
+	//
+	// pkt3 -> server
+	//
+	fmt.Printf("\n--- KxXX4 (server) ---\n")
+	// func KxXX4(st_server KxState, pkt3 []byte, psk []byte) (KxSessionKeyPair, []byte, int)
+	sessionKpServer, peerPkServer, xx4res := hydro.KxXX4(server_st, pkt3, nil)
+	if xx4res != 0 {
+		panic("KxXX4 returned non-zero")
+	}
+	fmt.Printf("sessionKpServer:\n")
+	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpServer.Rx()))
+	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpServer.Tx()))
+	fmt.Printf("[peerPk] -> %s\n", hydro.Bin2hex(peerPkServer))
+
+	fmt.Printf("\nESTABLISHED\n")
 }
 
 func ExampleKx() {
@@ -145,6 +199,7 @@ func ExampleKx() {
 
 	ExampleKxN()
 	ExampleKxKK()
+	ExampleKxXX()
 }
 
 func ExamplePwHash() {
