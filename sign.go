@@ -31,6 +31,7 @@ func (kp *SignKeypair) Sk() []byte {
 }
 
 /* --------------------------------- Keygen --------------------------------- */
+// Prototype:
 // void hydro_sign_keygen(hydro_sign_keypair *kp);
 func SignKeygen() SignKeypair {
 	cSignKeypair := new(C.struct_hydro_sign_keypair)
@@ -38,6 +39,7 @@ func SignKeygen() SignKeypair {
 	return SignKeypair{cSignKeypair}
 }
 
+// Prototype:
 // void hydro_sign_keygen_deterministic(hydro_sign_keypair *kp, const uint8_t seed[hydro_sign_SEEDBYTES]);
 func SignKeygenDeterministic(seed []byte) SignKeypair {
 	CheckSize(seed, SignSeedBytes, "seed")
@@ -47,6 +49,7 @@ func SignKeygenDeterministic(seed []byte) SignKeypair {
 }
 
 /* --------------------------------- Single --------------------------------- */
+// Prototype:
 // int hydro_sign_create(uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen, const char ctx[hydro_sign_CONTEXTBYTES], const uint8_t sk[hydro_sign_SECRETKEYBYTES]);
 func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 	CheckCtx(ctx, SignContextBytes)
@@ -65,6 +68,7 @@ func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 	return out, exit
 }
 
+// Prototype:
 // int hydro_sign_verify(const uint8_t csig[hydro_sign_BYTES], const void *m_, size_t mlen, const char ctx[hydro_sign_CONTEXTBYTES], const uint8_t pk[hydro_sign_PUBLICKEYBYTES]) _hydro_attr_warn_unused_result_;
 func SignVerify(sig []byte, m []byte, ctx string, pk []byte) bool {
 	CheckSize(sig, SignBytes, "sign sig")
@@ -84,6 +88,11 @@ func SignVerify(sig []byte, m []byte, ctx string, pk []byte) bool {
 }
 
 /* --------------------------------- Multi ---------------------------------- */
+
+//
+// TODO: detached methods
+//
+
 type SignState struct {
 	inner *C.hydro_sign_state
 }
@@ -100,6 +109,8 @@ func NewSignState() SignState {
 	return out
 }
 
+// Prototype:
+// int hydro_sign_init(hydro_sign_state *state, const char ctx[hydro_sign_CONTEXTBYTES]);
 func NewSignHelper(ctx string) SignHelper {
 	CheckCtx(ctx, SignContextBytes)
 	st := NewSignState()
@@ -110,6 +121,7 @@ func NewSignHelper(ctx string) SignHelper {
 	}
 }
 
+// Prototype:
 // int hydro_sign_update(hydro_sign_state *state, const void *m_, size_t mlen);
 func (s *SignHelper) Update(m []byte) {
 	mlen := len(m)
@@ -119,6 +131,7 @@ func (s *SignHelper) Update(m []byte) {
 		(C.size_t)(mlen))
 }
 
+// Prototype:
 // int hydro_sign_final_create(hydro_sign_state *state, uint8_t csig[hydro_sign_BYTES], const uint8_t sk[hydro_sign_SECRETKEYBYTES]);
 func (s *SignHelper) FinalCreate(sk []byte, wipe bool) []byte {
 	CheckSize(sk, SignSecretKeyBytes, "sign sk")
@@ -130,6 +143,7 @@ func (s *SignHelper) FinalCreate(sk []byte, wipe bool) []byte {
 	return out
 }
 
+// Prototype:
 // int hydro_sign_final_verify(hydro_sign_state *state, const uint8_t csig[hydro_sign_BYTES], const uint8_t pk[hydro_sign_PUBLICKEYBYTES]) _hydro_attr_warn_unused_result_;
 func (s *SignHelper) FinalVerify(sig []byte, pk []byte) bool {
 	CheckSize(sig, SignBytes, "sign sig")

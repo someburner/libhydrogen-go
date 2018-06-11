@@ -13,17 +13,20 @@ const (
 	KdfMinBytes     int = C.hydro_kdf_BYTES_MIN
 )
 
+// Prototype:
+// void hydro_kdf_keygen(uint8_t key[hydro_kdf_KEYBYTES]);
 func KdfKeygen() []byte {
 	buf := make([]byte, KdfKeyBytes)
 	C.hydro_kdf_keygen((*C.uchar)(&buf[0]))
 	return buf
 }
 
+// Prototype:
 // int hydro_kdf_derive_from_key(uint8_t *subkey, size_t subkey_len, uint64_t subkey_id, const char ctx[hydro_kdf_CONTEXTBYTES], const uint8_t key[hydro_kdf_KEYBYTES]);
 func KdfDeriveFromKey(subkey_len int, id uint64, ctx string, master_key []byte) ([]byte, int) {
-	CheckSize(master_key, KdfKeyBytes, "master_key")
+	CheckSize(master_key, KdfKeyBytes, "kdf-master_key")
 	CheckCtx(ctx, KdfContextBytes)
-	CheckIntInRange(subkey_len, KdfMinBytes, KdfMaxBytes, "subkey_len")
+	CheckIntInRange(subkey_len, KdfMinBytes, KdfMaxBytes, "kdf-subkey_len")
 	out := make([]byte, subkey_len)
 
 	exit := int(C.hydro_kdf_derive_from_key(

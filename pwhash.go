@@ -16,6 +16,7 @@ const (
 	PwHashStoredBytes    int = C.hydro_pwhash_STOREDBYTES
 )
 
+// Prototype:
 // void hydro_pwhash_keygen(uint8_t master_key[hydro_pwhash_MASTERKEYBYTES]);
 func PwHashKeygen() []byte {
 	out := make([]byte, PwHashMasterKeyBytes)

@@ -18,6 +18,7 @@ const (
 	HashKeyBytes     int = C.hydro_hash_KEYBYTES
 )
 
+// Prototype:
 // void hydro_hash_keygen(uint8_t *key);
 func HashKeygen() []byte {
 	out := make([]byte, HashKeyBytes)
@@ -25,6 +26,7 @@ func HashKeygen() []byte {
 	return out
 }
 
+// Prototype:
 // int hydro_hash_hash(uint8_t *out, size_t out_len, const void *in_, size_t in_len, const char ctx[hydro_hash_CONTEXTBYTES], const uint8_t *key);
 func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 	CheckCtx(ctx, HashContextBytes)

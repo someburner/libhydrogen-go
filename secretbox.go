@@ -17,17 +17,21 @@ const (
 	SecretboxProbeBytes   int = C.hydro_secretbox_PROBEBYTES
 )
 
+// Prototype:
+// void hydro_secretbox_keygen(uint8_t key[hydro_secretbox_KEYBYTES]);
 func SecretboxKeygen() []byte {
 	buf := make([]byte, SecretboxKeyBytes)
 	C.hydro_secretbox_keygen((*C.uchar)(&buf[0]))
 	return buf
 }
 
+// Prototype:
 // int hydro_secretbox_encrypt(uint8_t *c, const void *m_, size_t mlen, uint64_t msg_id, const char ctx[hydro_secretbox_CONTEXTBYTES], const uint8_t key[hydro_secretbox_KEYBYTES]);
 func SecretboxEncrypt(m []byte, mid uint64, ctx string, sk []byte) ([]byte, int) {
 	CheckCtx(ctx, SecretboxContextBytes)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	mlen := len(m)
+	CheckIntGt(mlen, 0, "secretbox-enc-mlen")
 	out := make([]byte, mlen+SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_encrypt(
@@ -41,11 +45,13 @@ func SecretboxEncrypt(m []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	return out, exit
 }
 
+// Prototype:
 // int hydro_secretbox_decrypt(void *m_, const uint8_t *c, size_t clen, uint64_t msg_id, const char ctx[hydro_secretbox_CONTEXTBYTES], const uint8_t key[hydro_secretbox_KEYBYTES]) __attribute__((warn_unused_result));
 func SecretboxDecrypt(c []byte, mid uint64, ctx string, sk []byte) ([]byte, int) {
 	CheckCtx(ctx, SecretboxContextBytes)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
+	CheckIntGt(clen, SecretboxHeaderBytes, "secretbox-dec-clen")
 	out := make([]byte, clen-SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_decrypt(
@@ -59,11 +65,13 @@ func SecretboxDecrypt(c []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	return out, exit
 }
 
+// Prototype:
 // void hydro_secretbox_probe_create(uint8_t probe[hydro_secretbox_PROBEBYTES], const uint8_t *c, size_t c_len, const char ctx[hydro_secretbox_CONTEXTBYTES], const uint8_t key[hydro_secretbox_KEYBYTES]);
 func SecretboxProbeCreate(c []byte, ctx string, sk []byte) []byte {
 	CheckCtx(ctx, SecretboxContextBytes)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
+	CheckIntGt(clen, 0, "probe-create-clen")
 	probe := make([]byte, SecretboxProbeBytes)
 
 	C.hydro_secretbox_probe_create(
@@ -76,12 +84,14 @@ func SecretboxProbeCreate(c []byte, ctx string, sk []byte) []byte {
 	return probe
 }
 
+// Prototype:
 // int hydro_secretbox_probe_verify(const uint8_t probe[hydro_secretbox_PROBEBYTES], const uint8_t *c, size_t c_len, const char ctx[hydro_secretbox_CONTEXTBYTES], const uint8_t key[hydro_secretbox_KEYBYTES]) __attribute__((warn_unused_result));
 func SecretboxProbeVerify(probe []byte, c []byte, ctx string, sk []byte) bool {
 	CheckSize(probe, SecretboxProbeBytes, "probe")
 	CheckCtx(ctx, SecretboxContextBytes)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
+	CheckIntGt(clen, 0, "probe-verify-clen")
 
 	result := int(C.hydro_secretbox_probe_verify(
 		(*C.uchar)(&probe[0]),
