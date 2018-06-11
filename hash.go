@@ -71,7 +71,6 @@ type HashHelper struct {
 
 // int hydro_hash_final(hydro_hash_state *state, uint8_t *out, size_t out_len);
 
-
 //
 // eof
 //

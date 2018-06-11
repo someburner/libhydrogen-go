@@ -22,10 +22,11 @@ const (
 type SignKeypair struct {
 	inner *C.hydro_sign_keypair
 }
-func (kp * SignKeypair) Pk() []byte {
+
+func (kp *SignKeypair) Pk() []byte {
 	return C.GoBytes(unsafe.Pointer(&kp.inner.pk), C.hydro_sign_PUBLICKEYBYTES)
 }
-func (kp * SignKeypair) Sk() []byte {
+func (kp *SignKeypair) Sk() []byte {
 	return C.GoBytes(unsafe.Pointer(&kp.inner.sk), C.hydro_sign_SECRETKEYBYTES)
 }
 

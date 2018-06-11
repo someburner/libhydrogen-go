@@ -12,14 +12,14 @@ import (
 
 const (
 	// n
-	KxNPacket1Bytes   int = C.hydro_kx_N_PACKET1BYTES
+	KxNPacket1Bytes int = C.hydro_kx_N_PACKET1BYTES
 	// kk
-	KxKKPacket1Bytes  int = C.hydro_kx_KK_PACKET1BYTES
-	KxKKPacket2Bytes  int = C.hydro_kx_KK_PACKET2BYTES
+	KxKKPacket1Bytes int = C.hydro_kx_KK_PACKET1BYTES
+	KxKKPacket2Bytes int = C.hydro_kx_KK_PACKET2BYTES
 	// xx
-	KxXXPacket1Bytes  int = C.hydro_kx_XX_PACKET1BYTES
-	KxXXPacket2Bytes  int = C.hydro_kx_XX_PACKET2BYTES
-	KxXXPacket3Bytes  int = C.hydro_kx_XX_PACKET3BYTES
+	KxXXPacket1Bytes int = C.hydro_kx_XX_PACKET1BYTES
+	KxXXPacket2Bytes int = C.hydro_kx_XX_PACKET2BYTES
+	KxXXPacket3Bytes int = C.hydro_kx_XX_PACKET3BYTES
 	// keys
 	KxPublicKeyBytes  int = C.hydro_kx_PUBLICKEYBYTES
 	KxSecretKeyBytes  int = C.hydro_kx_SECRETKEYBYTES
@@ -33,10 +33,11 @@ const (
 type KxKeyPair struct {
 	inner *C.hydro_kx_keypair
 }
-func (kp * KxKeyPair) Pk() []byte {
+
+func (kp *KxKeyPair) Pk() []byte {
 	return C.GoBytes(unsafe.Pointer(&kp.inner.pk), C.hydro_kx_PUBLICKEYBYTES)
 }
-func (kp * KxKeyPair) Sk() []byte {
+func (kp *KxKeyPair) Sk() []byte {
 	return C.GoBytes(unsafe.Pointer(&kp.inner.sk), C.hydro_kx_SECRETKEYBYTES)
 }
 
@@ -45,10 +46,11 @@ func (kp * KxKeyPair) Sk() []byte {
 type KxSessionKeyPair struct {
 	inner *C.hydro_kx_session_keypair
 }
-func (kp * KxSessionKeyPair) Rx() []byte {
+
+func (kp *KxSessionKeyPair) Rx() []byte {
 	return C.GoBytes(unsafe.Pointer(&kp.inner.rx), C.hydro_kx_SESSIONKEYBYTES)
 }
-func (kp * KxSessionKeyPair) Tx() []byte {
+func (kp *KxSessionKeyPair) Tx() []byte {
 	return C.GoBytes(unsafe.Pointer(&kp.inner.tx), C.hydro_kx_SESSIONKEYBYTES)
 }
 
@@ -335,12 +337,10 @@ func KxXX4(st_server KxState, pkt3 []byte, psk []byte) (KxSessionKeyPair, []byte
 	return KxSessionKeyPair{cSessionKpServer}, peer_pk, exit
 }
 
-
 type KxHelperXX struct {
 	state   KxState
 	context string
 }
-
 
 //
 // eof

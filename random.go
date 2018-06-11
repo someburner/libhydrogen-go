@@ -24,7 +24,7 @@ func RandomU32() uint32 {
 // uint32_t hydro_random_uniform(const uint32_t upper_bound);
 func RandomUniform(upper_bound uint32) uint32 {
 	// uint32_t hydro_random_u32(void);
-	return uint32(C.hydro_random_uniform( C.uint(upper_bound) ))
+	return uint32(C.hydro_random_uniform(C.uint(upper_bound)))
 }
 
 func RandomBuf(l int) []byte {
@@ -56,7 +56,6 @@ func RandomReseed() {
 	// void hydro_random_reseed(void);
 	C.hydro_random_reseed()
 }
-
 
 //
 // eof
