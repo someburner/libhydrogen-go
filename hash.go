@@ -30,7 +30,7 @@ func HashKeygen() []byte {
 // int hydro_hash_hash(uint8_t *out, size_t out_len, const void *in_, size_t in_len, const char ctx[hydro_hash_CONTEXTBYTES], const uint8_t *key);
 func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 	CheckCtx(ctx, HashContextBytes)
-	CheckIntGtOrEq(out_len, HashBytes, "hash out_len")
+	CheckIntInRange(out_len, HashBytesMin, HashBytesMax, "hash out_len")
 	data_len := len(data)
 	out := make([]byte, out_len)
 	var exit int
@@ -54,6 +54,12 @@ func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 	return out, exit
 }
 
+/* --------------------------------- Multi ---------------------------------- */
+
+//
+// TODO: detached methods
+//
+
 type HashState struct {
 	inner *C.hydro_hash_state
 }
@@ -63,15 +69,51 @@ type HashHelper struct {
 	context string
 }
 
-//
-// TODO
-//
+// Create a new HashState object. Does not initialize it.
+func NewHashState() HashState {
+	buf := new(C.hydro_hash_state)
+	out := HashState{buf}
+	return out
+}
 
-// int hydro_hash_init(hydro_hash_state *state, const char ctx[hydro_hash_CONTEXTBYTES], const uint8_t *key);
+// Prototype:
+// int hydro_hash_init(hydro_hash_state *state, const char ctx[hydro_hash_CONTEXTBYTES], const uint8_t key[hydro_hash_KEYBYTES]);
+func NewHashHelper(ctx string, key []byte) HashHelper {
+	CheckCtx(ctx, HashContextBytes)
+	st := NewHashState()
+	if key != nil {
+		CheckSize(key, HashKeyBytes, "hashkey")
+		C.hydro_hash_init(st.inner, C.CString(ctx), (*C.uchar)(&key[0]))
+	} else {
+		C.hydro_hash_init(st.inner, C.CString(ctx), nil)
+	}
+	return HashHelper{
+		state:   st,
+		context: ctx,
+	}
+}
 
+// Prototype:
 // int hydro_hash_update(hydro_hash_state *state, const void *in_, size_t in_len);
+func (h *HashHelper) Update(m []byte) {
+	mlen := len(m)
+	C.hydro_hash_update(
+		h.state.inner,
+		unsafe.Pointer(&m[0]),
+		(C.size_t)(mlen))
+}
 
+// Prototype:
 // int hydro_hash_final(hydro_hash_state *state, uint8_t *out, size_t out_len);
+func (h *HashHelper) Final(out_len int) []byte {
+	CheckIntInRange(out_len, HashBytesMin, HashBytesMax, "hash out_len")
+	out := make([]byte, out_len)
+	C.hydro_hash_final(
+		h.state.inner,
+		(*C.uchar)(&out[0]),
+		(C.size_t)(out_len))
+	return out
+}
 
 //
 // eof

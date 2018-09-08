@@ -51,6 +51,20 @@ func ExampleHash() {
 		panic("HashHash returned non-zero")
 	}
 	fmt.Printf("h2 [%d] %s\n", len(h2), hydro.Bin2hex(h2))
+
+	fmt.Printf("\n--- HashHelper (multi) ---\n")
+	hh1 := hydro.NewHashHelper(GOOD_CTX, nil)
+	hh1.Update([]byte(TEST_MSG1))
+	hh1.Update([]byte(TEST_MSG2))
+	hashmulti1 := hh1.Final(hydro.HashBytes)
+	fmt.Printf("hashmulti1[%d]:\n%s\n", len(hashmulti1), hydro.Bin2hex(hashmulti1))
+
+	fmt.Printf("\n--- HashHelper (multi, key) ---\n")
+	hh2 := hydro.NewHashHelper(GOOD_CTX, sk)
+	hh2.Update([]byte(TEST_MSG1))
+	hh2.Update([]byte(TEST_MSG2))
+	hashmulti2 := hh2.Final(hydro.HashBytes)
+	fmt.Printf("hashmulti2 (key)[%d]:\n%s\n", len(hashmulti2), hydro.Bin2hex(hashmulti2))
 }
 
 func ExampleKdf() {
