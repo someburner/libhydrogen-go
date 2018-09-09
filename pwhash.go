@@ -12,7 +12,7 @@ const (
 	PwHashStoredBytes    int = C.hydro_pwhash_STOREDBYTES
 
 	PwHashDeterministicMemLimit int = 0
-	PwHashDeterministicThreads int = 1
+	PwHashDeterministicThreads  int = 1
 )
 
 // Prototype:
