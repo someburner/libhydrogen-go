@@ -16,7 +16,7 @@ func main() {
 	ExampleRandom()
 	ExampleSecretbox()
 	ExampleSign()
-	fmt.Println("finish")
+	fmt.Println("\n\nOKAY\nAll Example methods ran to completion\n")
 }
 
 const GOOD_CTX = "goctx123"
@@ -235,21 +235,21 @@ func ExamplePwHash() {
 	fmt.Printf("\n--- PwHashDeterministic ---\n")
 	derived_key, res := hydro.PwHashDeterministic(32, PWHASH_PASSWD, GOOD_CTX, master, opslimit)
 	if res != 0 {
-		panic("PwHashDeterministic")
+		panic("PwHashDeterministic failed")
 	}
 	fmt.Printf("derived_key [%d] %s\n", len(derived_key), hydro.Bin2hex(derived_key))
 
 	fmt.Printf("\n--- PwHashCreate ---\n")
 	pwhash1, res := hydro.PwHashCreate(PWHASH_PASSWD, master, opslimit, memlimit, threads)
 	if res != 0 {
-		fmt.Printf("PwHashCreate failed\n")
+		panic("PwHashCreate failed")
 	} else {
 		fmt.Printf("pwhash1 [%d] %s\n", len(pwhash1), hydro.Bin2hex(pwhash1))
 	}
 
 	fmt.Printf("\n--- PwHashVerify (good) ---\n")
 	if hydro.PwHashVerify(pwhash1, PWHASH_PASSWD, master, opslimit, memlimit, threads) != 0 {
-		fmt.Printf("PwHashVerify failed\n")
+		panic("PwHashVerify failed")
 	} else {
 		fmt.Printf("PwHashVerify success\n")
 	}
@@ -257,13 +257,13 @@ func ExamplePwHash() {
 	if hydro.PwHashVerify(pwhash1, "wrong password", master, opslimit, memlimit, threads) != 0 {
 		fmt.Printf("PwHashVerify failed - OK\n")
 	} else {
-		fmt.Printf("PwHashVerify should have failed\n")
+		panic("PwHashVerify should have failed")
 	}
 
 	fmt.Printf("\n--- PwHashDeriveStaticKey ---\n")
 	static_key, res := hydro.PwHashDeriveStaticKey(32, pwhash1, PWHASH_PASSWD, GOOD_CTX, master, opslimit, memlimit, threads)
 	if res != 0 {
-		fmt.Printf("PwHashDeriveStaticKey failed\n")
+		panic("PwHashDeriveStaticKey failed")
 	} else {
 		fmt.Printf("PwHashDeriveStaticKey [%d] %s\n", len(static_key), hydro.Bin2hex(static_key))
 	}
@@ -272,18 +272,18 @@ func ExamplePwHash() {
 	fmt.Printf("PwHashReEncrypt - Before [%d] %s\n", len(pwhash1), hydro.Bin2hex(pwhash1))
 	new_master := hydro.PwHashKeygen()
 	if hydro.PwHashReEncrypt(pwhash1, master, new_master) != 0 {
-		fmt.Printf("PwHashReEncrypt failed\n")
+		panic("PwHashReEncrypt failed")
 	} else {
 		fmt.Printf("PwHashReEncrypt - After [%d] %s\n", len(pwhash1), hydro.Bin2hex(pwhash1))
 		if hydro.PwHashVerify(pwhash1, PWHASH_PASSWD, new_master, opslimit, memlimit, threads) != 0 {
-			fmt.Printf("PwHashVerify failed after PwHashReEncrypt\n")
+			panic("PwHashVerify failed after PwHashReEncrypt")
 		} else {
 			fmt.Printf("PwHashVerify success after PwHashReEncrypt\n")
 		}
 		if hydro.PwHashVerify(pwhash1, PWHASH_PASSWD, master, opslimit, memlimit, threads) != 0 {
 			fmt.Printf("PwHashVerify failed (using old master) - OK\n")
 		} else {
-			fmt.Printf("PwHashVerify success (using old master) - BAD\n")
+			panic("PwHashVerify success (using old master) - BAD")
 		}
 	}
 
@@ -292,7 +292,7 @@ func ExamplePwHash() {
 	var memlimit_new int = 0
 	var threads_new uint8 = 2
 	if hydro.PwHashUpgrade(pwhash1, new_master, opslimit_new, memlimit_new, threads_new) != 0 {
-		fmt.Printf("PwHashUpgrade failed\n")
+		panic("PwHashUpgrade failed")
 	} else {
 		fmt.Printf("PwHashUpgrade [%d] %s\n", len(pwhash1), hydro.Bin2hex(pwhash1))
 	}

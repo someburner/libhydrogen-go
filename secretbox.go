@@ -21,7 +21,7 @@ const (
 // void hydro_secretbox_keygen(uint8_t key[hydro_secretbox_KEYBYTES]);
 func SecretboxKeygen() []byte {
 	buf := make([]byte, SecretboxKeyBytes)
-	C.hydro_secretbox_keygen((*C.uchar)(&buf[0]))
+	C.hydro_secretbox_keygen((*C.uint8_t)(&buf[0]))
 	return buf
 }
 
@@ -35,12 +35,12 @@ func SecretboxEncrypt(m []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	out := make([]byte, mlen+SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_encrypt(
-		(*C.uchar)(&out[0]),
+		(*C.uint8_t)(&out[0]),
 		unsafe.Pointer(&m[0]),
 		(C.size_t)(mlen),
 		(C.uint64_t)(mid),
 		C.CString(ctx),
-		(*C.uchar)(&sk[0])))
+		(*C.uint8_t)(&sk[0])))
 
 	return out, exit
 }
@@ -56,11 +56,11 @@ func SecretboxDecrypt(c []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 
 	exit := int(C.hydro_secretbox_decrypt(
 		unsafe.Pointer(&out[0]),
-		(*C.uchar)(&c[0]),
+		(*C.uint8_t)(&c[0]),
 		(C.size_t)(clen),
 		(C.uint64_t)(mid),
 		C.CString(ctx),
-		(*C.uchar)(&sk[0])))
+		(*C.uint8_t)(&sk[0])))
 
 	return out, exit
 }
@@ -75,11 +75,11 @@ func SecretboxProbeCreate(c []byte, ctx string, sk []byte) []byte {
 	probe := make([]byte, SecretboxProbeBytes)
 
 	C.hydro_secretbox_probe_create(
-		(*C.uchar)(&probe[0]),
-		(*C.uchar)(&c[0]),
+		(*C.uint8_t)(&probe[0]),
+		(*C.uint8_t)(&c[0]),
 		(C.size_t)(clen),
 		C.CString(ctx),
-		(*C.uchar)(&sk[0]))
+		(*C.uint8_t)(&sk[0]))
 
 	return probe
 }
@@ -94,11 +94,11 @@ func SecretboxProbeVerify(probe []byte, c []byte, ctx string, sk []byte) bool {
 	CheckIntGt(clen, 0, "probe-verify-clen")
 
 	result := int(C.hydro_secretbox_probe_verify(
-		(*C.uchar)(&probe[0]),
-		(*C.uchar)(&c[0]),
+		(*C.uint8_t)(&probe[0]),
+		(*C.uint8_t)(&c[0]),
 		(C.size_t)(clen),
 		C.CString(ctx),
-		(*C.uchar)(&sk[0])))
+		(*C.uint8_t)(&sk[0])))
 
 	return bool(result == 0)
 }

@@ -19,7 +19,7 @@ const (
 // void hydro_pwhash_keygen(uint8_t master_key[hydro_pwhash_MASTERKEYBYTES]);
 func PwHashKeygen() []byte {
 	out := make([]byte, PwHashMasterKeyBytes)
-	C.hydro_pwhash_keygen((*C.uchar)(&out[0]))
+	C.hydro_pwhash_keygen((*C.uint8_t)(&out[0]))
 	return out
 }
 
@@ -36,12 +36,12 @@ func PwHashDeterministic(h_len int, passwd string, ctx string, master_key []byte
 
 	out := make([]byte, h_len)
 	exit := int(C.hydro_pwhash_deterministic(
-		(*C.uchar)(&out[0]),
+		(*C.uint8_t)(&out[0]),
 		C.size_t(h_len),
 		C.CString(passwd),
 		C.size_t(len(passwd)),
 		C.CString(ctx),
-		(*C.uchar)(&master_key[0]),
+		(*C.uint8_t)(&master_key[0]),
 		C.size_t(opslimit),
 		C.size_t(PwHashDeterministicMemLimit),
 		C.uint8_t(PwHashDeterministicThreads)))
@@ -59,10 +59,10 @@ func PwHashCreate(passwd string, master_key []byte, opslimit uint64, memlimit in
 
 	out := make([]byte, PwHashStoredBytes)
 	exit := int(C.hydro_pwhash_create(
-		(*C.uchar)(&out[0]),
+		(*C.uint8_t)(&out[0]),
 		C.CString(passwd),
 		C.size_t(len(passwd)),
-		(*C.uchar)(&master_key[0]),
+		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit),
 		C.size_t(memlimit),
 		C.uint8_t(threads)))
@@ -80,10 +80,10 @@ func PwHashVerify(stored []byte, passwd string, master_key []byte, opslimit_max 
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
 
 	exit := int(C.hydro_pwhash_verify(
-		(*C.uchar)(&stored[0]),
+		(*C.uint8_t)(&stored[0]),
 		C.CString(passwd),
 		C.size_t(len(passwd)),
-		(*C.uchar)(&master_key[0]),
+		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit_max),
 		C.size_t(memlimit_max),
 		C.uint8_t(threads_max)))
@@ -112,7 +112,7 @@ func PwHashDeriveStaticKey(static_key_len int, stored []byte, passwd string, ctx
 		C.CString(passwd),
 		C.size_t(len(passwd)),
 		C.CString(ctx),
-		(*C.uchar)(&master_key[0]),
+		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit_max),
 		C.size_t(memlimit_max),
 		C.uint8_t(threads_max)))
@@ -144,8 +144,8 @@ func PwHashUpgrade(stored []byte, master_key []byte, opslimit uint64, memlimit i
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
 
 	exit := int(C.hydro_pwhash_upgrade(
-		(*C.uchar)(&stored[0]),
-		(*C.uchar)(&master_key[0]),
+		(*C.uint8_t)(&stored[0]),
+		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit),
 		C.size_t(memlimit),
 		C.uint8_t(threads)))

@@ -17,7 +17,7 @@ const (
 // void hydro_kdf_keygen(uint8_t key[hydro_kdf_KEYBYTES]);
 func KdfKeygen() []byte {
 	buf := make([]byte, KdfKeyBytes)
-	C.hydro_kdf_keygen((*C.uchar)(&buf[0]))
+	C.hydro_kdf_keygen((*C.uint8_t)(&buf[0]))
 	return buf
 }
 
@@ -30,11 +30,11 @@ func KdfDeriveFromKey(subkey_len int, id uint64, ctx string, master_key []byte) 
 	out := make([]byte, subkey_len)
 
 	exit := int(C.hydro_kdf_derive_from_key(
-		(*C.uchar)(&out[0]),
+		(*C.uint8_t)(&out[0]),
 		(C.size_t)(subkey_len),
 		(C.uint64_t)(id),
 		C.CString(ctx),
-		(*C.uchar)(&master_key[0])))
+		(*C.uint8_t)(&master_key[0])))
 
 	return out, exit
 }

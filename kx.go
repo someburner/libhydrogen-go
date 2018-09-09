@@ -66,7 +66,7 @@ func KxKeygen() KxKeyPair {
 func KxKeygenDeterministic(seed []byte) KxKeyPair {
 	CheckSize(seed, KxSeedBytes, "seed")
 	cKxKeypair := new(C.struct_hydro_kx_keypair)
-	C.hydro_kx_keygen_deterministic(cKxKeypair, (*C.uchar)(&seed[0]))
+	C.hydro_kx_keygen_deterministic(cKxKeypair, (*C.uint8_t)(&seed[0]))
 	return KxKeyPair{cKxKeypair}
 }
 
@@ -101,15 +101,15 @@ func KxN1(psk []byte, server_pubkey []byte) (KxSessionKeyPair, []byte, int) {
 	if psk != nil {
 		exit = int(C.hydro_kx_n_1(
 			cSessionKp,
-			(*C.uchar)(&pkt1[0]),
-			(*C.uchar)(&psk[0]),
-			(*C.uchar)(&server_pubkey[0])))
+			(*C.uint8_t)(&pkt1[0]),
+			(*C.uint8_t)(&psk[0]),
+			(*C.uint8_t)(&server_pubkey[0])))
 	} else {
 		exit = int(C.hydro_kx_n_1(
 			cSessionKp,
-			(*C.uchar)(&pkt1[0]),
+			(*C.uint8_t)(&pkt1[0]),
 			nil,
-			(*C.uchar)(&server_pubkey[0])))
+			(*C.uint8_t)(&server_pubkey[0])))
 	}
 	return KxSessionKeyPair{cSessionKp}, pkt1, exit
 }
@@ -131,13 +131,13 @@ func KxN2(pkt1 []byte, psk []byte, server_kp KxKeyPair) (KxSessionKeyPair, int) 
 	if psk != nil {
 		exit = int(C.hydro_kx_n_2(
 			cSessionKp,
-			(*C.uchar)(&pkt1[0]),
-			(*C.uchar)(&psk[0]),
+			(*C.uint8_t)(&pkt1[0]),
+			(*C.uint8_t)(&psk[0]),
 			server_kp.inner))
 	} else {
 		exit = int(C.hydro_kx_n_2(
 			cSessionKp,
-			(*C.uchar)(&pkt1[0]),
+			(*C.uint8_t)(&pkt1[0]),
 			nil,
 			server_kp.inner))
 	}
@@ -157,8 +157,8 @@ func KxKK1(st_client KxState, server_pubkey []byte, client_kp KxKeyPair) ([]byte
 
 	exit := int(C.hydro_kx_kk_1(
 		st_client.inner,
-		(*C.uchar)(&pkt1[0]),
-		(*C.uchar)(&server_pubkey[0]),
+		(*C.uint8_t)(&pkt1[0]),
+		(*C.uint8_t)(&server_pubkey[0]),
 		client_kp.inner))
 
 	return pkt1, exit
@@ -178,9 +178,9 @@ func KxKK2(pkt1 []byte, client_pubkey []byte, server_kp KxKeyPair) (KxSessionKey
 
 	exit := int(C.hydro_kx_kk_2(
 		cSessionKp,
-		(*C.uchar)(&pkt2[0]),
-		(*C.uchar)(&pkt1[0]),
-		(*C.uchar)(&client_pubkey[0]),
+		(*C.uint8_t)(&pkt2[0]),
+		(*C.uint8_t)(&pkt1[0]),
+		(*C.uint8_t)(&client_pubkey[0]),
 		server_kp.inner))
 
 	return KxSessionKeyPair{cSessionKp}, pkt2, exit
@@ -199,8 +199,8 @@ func KxKK3(st_client KxState, pkt2 []byte, server_pubkey []byte) (KxSessionKeyPa
 	exit := int(C.hydro_kx_kk_3(
 		st_client.inner,
 		cSessionKp,
-		(*C.uchar)(&pkt2[0]),
-		(*C.uchar)(&server_pubkey[0])))
+		(*C.uint8_t)(&pkt2[0]),
+		(*C.uint8_t)(&server_pubkey[0])))
 
 	return KxSessionKeyPair{cSessionKp}, exit
 }
@@ -225,12 +225,12 @@ func KxXX1(st_client KxState, psk []byte) ([]byte, int) {
 	if psk != nil {
 		exit = int(C.hydro_kx_xx_1(
 			st_client.inner,
-			(*C.uchar)(&pkt1[0]),
-			(*C.uchar)(&psk[0])))
+			(*C.uint8_t)(&pkt1[0]),
+			(*C.uint8_t)(&psk[0])))
 	} else {
 		exit = int(C.hydro_kx_xx_1(
 			st_client.inner,
-			(*C.uchar)(&pkt1[0]),
+			(*C.uint8_t)(&pkt1[0]),
 			nil))
 	}
 
@@ -252,15 +252,15 @@ func KxXX2(st_server KxState, pkt1 []byte, server_kp KxKeyPair, psk []byte) ([]b
 	if psk != nil {
 		exit = int(C.hydro_kx_xx_2(
 			st_server.inner,
-			(*C.uchar)(&pkt2[0]),
-			(*C.uchar)(&pkt1[0]),
-			(*C.uchar)(&psk[0]),
+			(*C.uint8_t)(&pkt2[0]),
+			(*C.uint8_t)(&pkt1[0]),
+			(*C.uint8_t)(&psk[0]),
 			server_kp.inner))
 	} else {
 		exit = int(C.hydro_kx_xx_2(
 			st_server.inner,
-			(*C.uchar)(&pkt2[0]),
-			(*C.uchar)(&pkt1[0]),
+			(*C.uint8_t)(&pkt2[0]),
+			(*C.uint8_t)(&pkt1[0]),
 			nil,
 			server_kp.inner))
 	}
@@ -286,18 +286,18 @@ func KxXX3(st_client KxState, pkt2 []byte, client_kp KxKeyPair, psk []byte) (KxS
 		exit = int(C.hydro_kx_xx_3(
 			st_client.inner,
 			cSessionKpClient,
-			(*C.uchar)(&pkt3[0]),
-			(*C.uchar)(&peer_pk[0]),
-			(*C.uchar)(&pkt2[0]),
-			(*C.uchar)(&psk[0]),
+			(*C.uint8_t)(&pkt3[0]),
+			(*C.uint8_t)(&peer_pk[0]),
+			(*C.uint8_t)(&pkt2[0]),
+			(*C.uint8_t)(&psk[0]),
 			client_kp.inner))
 	} else {
 		exit = int(C.hydro_kx_xx_3(
 			st_client.inner,
 			cSessionKpClient,
-			(*C.uchar)(&pkt3[0]),
-			(*C.uchar)(&peer_pk[0]),
-			(*C.uchar)(&pkt2[0]),
+			(*C.uint8_t)(&pkt3[0]),
+			(*C.uint8_t)(&peer_pk[0]),
+			(*C.uint8_t)(&pkt2[0]),
 			nil,
 			client_kp.inner))
 	}
@@ -322,15 +322,15 @@ func KxXX4(st_server KxState, pkt3 []byte, psk []byte) (KxSessionKeyPair, []byte
 		exit = int(C.hydro_kx_xx_4(
 			st_server.inner,
 			cSessionKpServer,
-			(*C.uchar)(&peer_pk[0]),
-			(*C.uchar)(&pkt3[0]),
-			(*C.uchar)(&psk[0])))
+			(*C.uint8_t)(&peer_pk[0]),
+			(*C.uint8_t)(&pkt3[0]),
+			(*C.uint8_t)(&psk[0])))
 	} else {
 		exit = int(C.hydro_kx_xx_4(
 			st_server.inner,
 			cSessionKpServer,
-			(*C.uchar)(&peer_pk[0]),
-			(*C.uchar)(&pkt3[0]),
+			(*C.uint8_t)(&peer_pk[0]),
+			(*C.uint8_t)(&pkt3[0]),
 			nil))
 	}
 

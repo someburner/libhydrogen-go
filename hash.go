@@ -22,7 +22,7 @@ const (
 // void hydro_hash_keygen(uint8_t *key);
 func HashKeygen() []byte {
 	out := make([]byte, HashKeyBytes)
-	C.hydro_hash_keygen((*C.uchar)(&out[0]))
+	C.hydro_hash_keygen((*C.uint8_t)(&out[0]))
 	return out
 }
 
@@ -36,15 +36,15 @@ func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 	var exit int
 	if key != nil {
 		exit = int(C.hydro_hash_hash(
-			(*C.uchar)(&out[0]),
+			(*C.uint8_t)(&out[0]),
 			(C.size_t)(out_len),
 			unsafe.Pointer(&data[0]),
 			(C.size_t)(data_len),
 			C.CString(ctx),
-			(*C.uchar)(&key[0])))
+			(*C.uint8_t)(&key[0])))
 	} else {
 		exit = int(C.hydro_hash_hash(
-			(*C.uchar)(&out[0]),
+			(*C.uint8_t)(&out[0]),
 			(C.size_t)(out_len),
 			unsafe.Pointer(&data[0]),
 			(C.size_t)(data_len),
@@ -83,7 +83,7 @@ func NewHashHelper(ctx string, key []byte) HashHelper {
 	st := NewHashState()
 	if key != nil {
 		CheckSize(key, HashKeyBytes, "hashkey")
-		C.hydro_hash_init(st.inner, C.CString(ctx), (*C.uchar)(&key[0]))
+		C.hydro_hash_init(st.inner, C.CString(ctx), (*C.uint8_t)(&key[0]))
 	} else {
 		C.hydro_hash_init(st.inner, C.CString(ctx), nil)
 	}
@@ -110,7 +110,7 @@ func (h *HashHelper) Final(out_len int) []byte {
 	out := make([]byte, out_len)
 	C.hydro_hash_final(
 		h.state.inner,
-		(*C.uchar)(&out[0]),
+		(*C.uint8_t)(&out[0]),
 		(C.size_t)(out_len))
 	return out
 }

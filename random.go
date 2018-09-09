@@ -46,7 +46,7 @@ func RandomBufDeterministic(l int, seed []byte) []byte {
 	C.hydro_random_buf_deterministic(
 		unsafe.Pointer(&out[0]),
 		C.size_t(l),
-		(*C.uchar)(&seed[0]))
+		(*C.uint8_t)(&seed[0]))
 	return out
 }
 

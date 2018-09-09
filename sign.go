@@ -44,7 +44,7 @@ func SignKeygen() SignKeypair {
 func SignKeygenDeterministic(seed []byte) SignKeypair {
 	CheckSize(seed, SignSeedBytes, "seed")
 	cSignKeypair := new(C.struct_hydro_sign_keypair)
-	C.hydro_sign_keygen_deterministic(cSignKeypair, (*C.uchar)(&seed[0]))
+	C.hydro_sign_keygen_deterministic(cSignKeypair, (*C.uint8_t)(&seed[0]))
 	return SignKeypair{cSignKeypair}
 }
 
@@ -59,11 +59,11 @@ func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 
 	// Returns 0 on success
 	exit := int(C.hydro_sign_create(
-		(*C.uchar)(&out[0]),
+		(*C.uint8_t)(&out[0]),
 		unsafe.Pointer(&m[0]),
 		(C.size_t)(mlen),
 		C.CString(ctx),
-		(*C.uchar)(&sk[0])))
+		(*C.uint8_t)(&sk[0])))
 
 	return out, exit
 }
@@ -78,11 +78,11 @@ func SignVerify(sig []byte, m []byte, ctx string, pk []byte) bool {
 
 	// Returns 0 on success
 	exit := int(C.hydro_sign_verify(
-		(*C.uchar)(&sig[0]),
+		(*C.uint8_t)(&sig[0]),
 		unsafe.Pointer(&m[0]),
 		(C.size_t)(mlen),
 		C.CString(ctx),
-		(*C.uchar)(&pk[0])))
+		(*C.uint8_t)(&pk[0])))
 
 	return bool(exit == 0)
 }
@@ -138,8 +138,8 @@ func (s *SignHelper) FinalCreate(sk []byte, wipe bool) []byte {
 	out := make([]byte, SignBytes)
 	C.hydro_sign_final_create(
 		s.state.inner,
-		(*C.uchar)(&out[0]),
-		(*C.uchar)(&sk[0]))
+		(*C.uint8_t)(&out[0]),
+		(*C.uint8_t)(&sk[0]))
 	return out
 }
 
@@ -150,8 +150,8 @@ func (s *SignHelper) FinalVerify(sig []byte, pk []byte) bool {
 	CheckSize(pk, SignPublicKeyBytes, "sign pk")
 	exit := int(C.hydro_sign_final_verify(
 		s.state.inner,
-		(*C.uchar)(&sig[0]),
-		(*C.uchar)(&pk[0])))
+		(*C.uint8_t)(&sig[0]),
+		(*C.uint8_t)(&pk[0])))
 	return bool(exit == 0)
 }
 
