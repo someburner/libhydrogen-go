@@ -190,17 +190,16 @@ func KxKK2(pkt1 []byte, client_pubkey []byte, server_kp KxKeyPair) (KxSessionKey
 // * compute session key pair using server pkt2
 // * Returns KxSessionKeyPair, pkt2 slice, 0/-1 (success/error)
 // Prototype:
-// int hydro_kx_kk_3(hydro_kx_state *state, hydro_kx_session_keypair *kp, const uint8_t packet2[hydro_kx_KK_PACKET2BYTES], const uint8_t peer_static_pk[hydro_kx_PUBLICKEYBYTES]);
-func KxKK3(st_client KxState, pkt2 []byte, server_pubkey []byte) (KxSessionKeyPair, int) {
+// int hydro_kx_kk_3(hydro_kx_state *state, hydro_kx_session_keypair *kp, const uint8_t packet2[hydro_kx_KK_PACKET2BYTES], const hydro_kx_keypair *static_kp);
+func KxKK3(st_client KxState, pkt2 []byte, client_kp KxKeyPair) (KxSessionKeyPair, int) {
 	CheckSize(pkt2, KxKKPacket1Bytes, "kk3-pkt2 bytes")
-	CheckSize(server_pubkey, KxPublicKeyBytes, "kk3-server_pubkey")
 	cSessionKp := new(C.struct_hydro_kx_session_keypair)
 
 	exit := int(C.hydro_kx_kk_3(
 		st_client.inner,
 		cSessionKp,
 		(*C.uint8_t)(&pkt2[0]),
-		(*C.uint8_t)(&server_pubkey[0])))
+		client_kp.inner))
 
 	return KxSessionKeyPair{cSessionKp}, exit
 }

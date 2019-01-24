@@ -136,7 +136,7 @@ func ExampleKxKK() {
 	fmt.Printf("\n[pkt2] -> %s\n", hydro.Bin2hex(pkt2))
 
 	fmt.Printf("\n--- KxKK3 (client) ---\n")
-	sessionKpClient, kk3res := hydro.KxKK3(client_st, pkt2, server_kp.Pk())
+	sessionKpClient, kk3res := hydro.KxKK3(client_st, pkt2, client_kp)
 	if kk3res != 0 {
 		panic("KxKK3 returned non-zero")
 	}
