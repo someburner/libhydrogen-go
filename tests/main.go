@@ -109,6 +109,14 @@ func ExampleKxN() {
 	fmt.Printf("sessionKpServer\n")
 	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpServer.Rx()))
 	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpServer.Tx()))
+
+	if !hydro.MemEqual(sessionKpClient.Rx(), sessionKpServer.Tx(), hydro.KxSessionKeyBytes) {
+		panic("Client.Rx != Server.Tx")
+	}
+	if !hydro.MemEqual(sessionKpClient.Tx(), sessionKpServer.Rx(), hydro.KxSessionKeyBytes) {
+		panic("Client.Tx != Server.Rx")
+	}
+	fmt.Printf("\nESTABLISHED\n")
 }
 
 func ExampleKxKK() {
@@ -143,6 +151,14 @@ func ExampleKxKK() {
 	fmt.Printf("sessionKpClient\n")
 	fmt.Printf("[Rx] -> %s\n", hydro.Bin2hex(sessionKpClient.Rx()))
 	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpClient.Tx()))
+
+	if !hydro.MemEqual(sessionKpClient.Rx(), sessionKpServer.Tx(), hydro.KxSessionKeyBytes) {
+		panic("Client.Rx != Server.Tx")
+	}
+	if !hydro.MemEqual(sessionKpClient.Tx(), sessionKpServer.Rx(), hydro.KxSessionKeyBytes) {
+		panic("Client.Tx != Server.Rx")
+	}
+	fmt.Printf("\nESTABLISHED\n")
 }
 
 func ExampleKxXX() {
@@ -198,6 +214,12 @@ func ExampleKxXX() {
 	fmt.Printf("[Tx] -> %s\n", hydro.Bin2hex(sessionKpServer.Tx()))
 	fmt.Printf("[peerPk] -> %s\n", hydro.Bin2hex(peerPkServer))
 
+	if !hydro.MemEqual(sessionKpClient.Rx(), sessionKpServer.Tx(), hydro.KxSessionKeyBytes) {
+		panic("Client.Rx != Server.Tx")
+	}
+	if !hydro.MemEqual(sessionKpClient.Tx(), sessionKpServer.Rx(), hydro.KxSessionKeyBytes) {
+		panic("Client.Tx != Server.Rx")
+	}
 	fmt.Printf("\nESTABLISHED\n")
 }
 

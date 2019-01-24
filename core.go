@@ -62,12 +62,12 @@ func MemZero(buf []byte) {
 }
 
 // NOTE: not a lexicographic comparator, not a replacement for memcmp
+// bool hydro_equal(const void *b1_, const void *b2_, size_t len);
 func MemEqual(buff1, buff2 []byte, length int) bool {
-	if length >= len(buff1) || length >= len(buff2) {
-		panic(fmt.Sprintf("Attempt to compare more bytes (%d) than provided "+
-			"(%d, %d)", length, len(buff1), len(buff2)))
+	if length != len(buff1) || length != len(buff2) {
+		panic(fmt.Sprintf("MemEqual: One or more buf lens (%d, %d) != %d",
+			len(buff1), len(buff2), length))
 	}
-	// bool hydro_equal(const void *b1_, const void *b2_, size_t len);
 	return bool(C.hydro_equal(unsafe.Pointer(&buff1[0]), unsafe.Pointer(&buff2[0]), C.size_t(length)))
 }
 
