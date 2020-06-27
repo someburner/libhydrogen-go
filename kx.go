@@ -340,7 +340,3 @@ type KxHelperXX struct {
 	state   KxState
 	context string
 }
-
-//
-// eof
-//

@@ -32,6 +32,7 @@ func SecretboxEncrypt(m []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	mlen := len(m)
 	CheckIntGt(mlen, 0, "secretbox-enc-mlen")
+	cCtx := []byte(ctx)
 	out := make([]byte, mlen+SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_encrypt(
@@ -39,7 +40,7 @@ func SecretboxEncrypt(m []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 		unsafe.Pointer(&m[0]),
 		(C.size_t)(mlen),
 		(C.uint64_t)(mid),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&sk[0])))
 
 	return out, exit
@@ -52,6 +53,7 @@ func SecretboxDecrypt(c []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
 	CheckIntGt(clen, SecretboxHeaderBytes, "secretbox-dec-clen")
+	cCtx := []byte(ctx)
 	out := make([]byte, clen-SecretboxHeaderBytes)
 
 	exit := int(C.hydro_secretbox_decrypt(
@@ -59,7 +61,7 @@ func SecretboxDecrypt(c []byte, mid uint64, ctx string, sk []byte) ([]byte, int)
 		(*C.uint8_t)(&c[0]),
 		(C.size_t)(clen),
 		(C.uint64_t)(mid),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&sk[0])))
 
 	return out, exit
@@ -72,13 +74,14 @@ func SecretboxProbeCreate(c []byte, ctx string, sk []byte) []byte {
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
 	CheckIntGt(clen, 0, "probe-create-clen")
+	cCtx := []byte(ctx)
 	probe := make([]byte, SecretboxProbeBytes)
 
 	C.hydro_secretbox_probe_create(
 		(*C.uint8_t)(&probe[0]),
 		(*C.uint8_t)(&c[0]),
 		(C.size_t)(clen),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&sk[0]))
 
 	return probe
@@ -92,17 +95,14 @@ func SecretboxProbeVerify(probe []byte, c []byte, ctx string, sk []byte) bool {
 	CheckSize(sk, SecretboxKeyBytes, "sk")
 	clen := len(c)
 	CheckIntGt(clen, 0, "probe-verify-clen")
+	cCtx := []byte(ctx)
 
 	result := int(C.hydro_secretbox_probe_verify(
 		(*C.uint8_t)(&probe[0]),
 		(*C.uint8_t)(&c[0]),
 		(C.size_t)(clen),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&sk[0])))
 
 	return bool(result == 0)
 }
-
-//
-// eof
-//

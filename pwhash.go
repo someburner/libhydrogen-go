@@ -6,6 +6,10 @@ package hydrogen
 // #include <hydrogen.h>
 import "C"
 
+import (
+	"unsafe"
+)
+
 const (
 	PwHashContextBytes   int = C.hydro_pwhash_CONTEXTBYTES
 	PwHashMasterKeyBytes int = C.hydro_pwhash_MASTERKEYBYTES
@@ -33,18 +37,21 @@ func PwHashDeterministic(h_len int, passwd string, ctx string, master_key []byte
 	CheckIntGt(len(passwd), 0, "len(passwd)")
 	CheckCtx(ctx, PwHashContextBytes)
 	CheckSize(master_key, PwHashMasterKeyBytes, "len(master_key)")
-
+	cCtx := []byte(ctx)
+	cPasswd := []byte(passwd)
 	out := make([]byte, h_len)
+
 	exit := int(C.hydro_pwhash_deterministic(
 		(*C.uint8_t)(&out[0]),
 		C.size_t(h_len),
-		C.CString(passwd),
+		(*C.char)(unsafe.Pointer(&cPasswd[0])),
 		C.size_t(len(passwd)),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&master_key[0]),
 		C.size_t(opslimit),
 		C.size_t(PwHashDeterministicMemLimit),
 		C.uint8_t(PwHashDeterministicThreads)))
+
 	return out, exit
 }
 
@@ -56,16 +63,18 @@ func PwHashDeterministic(h_len int, passwd string, ctx string, master_key []byte
 func PwHashCreate(passwd string, master_key []byte, opslimit uint64, memlimit int, threads uint8) ([]byte, int) {
 	CheckIntGt(len(passwd), 0, "len(passwd)")
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
-
+	cPasswd := []byte(passwd)
 	out := make([]byte, PwHashStoredBytes)
+
 	exit := int(C.hydro_pwhash_create(
 		(*C.uint8_t)(&out[0]),
-		C.CString(passwd),
+		(*C.char)(unsafe.Pointer(&cPasswd[0])),
 		C.size_t(len(passwd)),
 		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit),
 		C.size_t(memlimit),
 		C.uint8_t(threads)))
+
 	return out, exit
 }
 
@@ -78,15 +87,17 @@ func PwHashVerify(stored []byte, passwd string, master_key []byte, opslimit_max 
 	CheckIntGt(len(passwd), 0, "len(passwd)")
 	CheckSize(stored, PwHashStoredBytes, "stored len")
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
+	cPasswd := []byte(passwd)
 
 	exit := int(C.hydro_pwhash_verify(
 		(*C.uint8_t)(&stored[0]),
-		C.CString(passwd),
+		(*C.char)(unsafe.Pointer(&cPasswd[0])),
 		C.size_t(len(passwd)),
 		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit_max),
 		C.size_t(memlimit_max),
 		C.uint8_t(threads_max)))
+
 	return exit
 }
 
@@ -103,19 +114,22 @@ func PwHashDeriveStaticKey(static_key_len int, stored []byte, passwd string, ctx
 	CheckIntGt(len(passwd), 0, "len(passwd)")
 	CheckCtx(ctx, PwHashContextBytes)
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
-
+	cPasswd := []byte(passwd)
+	cCtx := []byte(ctx)
 	static_key := make([]byte, static_key_len)
+
 	exit := int(C.hydro_pwhash_derive_static_key(
 		(*C.uint8_t)(&static_key[0]),
 		(C.size_t)(static_key_len),
 		(*C.uint8_t)(&stored[0]),
-		C.CString(passwd),
+		(*C.char)(unsafe.Pointer(&cPasswd[0])),
 		C.size_t(len(passwd)),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&master_key[0]),
 		C.uint64_t(opslimit_max),
 		C.size_t(memlimit_max),
 		C.uint8_t(threads_max)))
+
 	return static_key, exit
 }
 
@@ -132,6 +146,7 @@ func PwHashReEncrypt(stored []byte, master_key []byte, new_master_key []byte) in
 		(*C.uint8_t)(&stored[0]),
 		(*C.uint8_t)(&master_key[0]),
 		(*C.uint8_t)(&new_master_key[0])))
+
 	return exit
 }
 
@@ -149,9 +164,6 @@ func PwHashUpgrade(stored []byte, master_key []byte, opslimit uint64, memlimit i
 		C.uint64_t(opslimit),
 		C.size_t(memlimit),
 		C.uint8_t(threads)))
+
 	return exit
 }
-
-//
-// eof
-//

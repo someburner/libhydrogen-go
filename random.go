@@ -43,10 +43,12 @@ func RandomBufDeterministic(l int, seed []byte) []byte {
 	CheckSize(seed, RandomSeedBytes, "seed")
 	CheckIntGt(l, 0, "random buf det size")
 	out := make([]byte, l)
+
 	C.hydro_random_buf_deterministic(
 		unsafe.Pointer(&out[0]),
 		C.size_t(l),
 		(*C.uint8_t)(&seed[0]))
+
 	return out
 }
 
@@ -61,7 +63,3 @@ func RandomRatchet() {
 func RandomReseed() {
 	C.hydro_random_reseed()
 }
-
-//
-// eof
-//

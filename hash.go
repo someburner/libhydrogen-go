@@ -32,7 +32,9 @@ func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 	CheckCtx(ctx, HashContextBytes)
 	CheckIntInRange(out_len, HashBytesMin, HashBytesMax, "hash out_len")
 	data_len := len(data)
+	cCtx := []byte(ctx)
 	out := make([]byte, out_len)
+
 	var exit int
 	if key != nil {
 		exit = int(C.hydro_hash_hash(
@@ -40,7 +42,7 @@ func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 			(C.size_t)(out_len),
 			unsafe.Pointer(&data[0]),
 			(C.size_t)(data_len),
-			C.CString(ctx),
+			(*C.char)(unsafe.Pointer(&cCtx[0])),
 			(*C.uint8_t)(&key[0])))
 	} else {
 		exit = int(C.hydro_hash_hash(
@@ -48,7 +50,7 @@ func HashHash(out_len int, data []byte, ctx string, key []byte) ([]byte, int) {
 			(C.size_t)(out_len),
 			unsafe.Pointer(&data[0]),
 			(C.size_t)(data_len),
-			C.CString(ctx),
+			(*C.char)(unsafe.Pointer(&cCtx[0])),
 			nil))
 	}
 	return out, exit
@@ -80,12 +82,19 @@ func NewHashState() HashState {
 // int hydro_hash_init(hydro_hash_state *state, const char ctx[hydro_hash_CONTEXTBYTES], const uint8_t key[hydro_hash_KEYBYTES]);
 func NewHashHelper(ctx string, key []byte) HashHelper {
 	CheckCtx(ctx, HashContextBytes)
+	cCtx := []byte(ctx)
 	st := NewHashState()
 	if key != nil {
 		CheckSize(key, HashKeyBytes, "hashkey")
-		C.hydro_hash_init(st.inner, C.CString(ctx), (*C.uint8_t)(&key[0]))
+		C.hydro_hash_init(
+			st.inner,
+			(*C.char)(unsafe.Pointer(&cCtx[0])),
+			(*C.uint8_t)(&key[0]))
 	} else {
-		C.hydro_hash_init(st.inner, C.CString(ctx), nil)
+		C.hydro_hash_init(
+			st.inner,
+			(*C.char)(unsafe.Pointer(&cCtx[0])),
+			nil)
 	}
 	return HashHelper{
 		state:   st,
@@ -114,7 +123,3 @@ func (h *HashHelper) Final(out_len int) []byte {
 		(C.size_t)(out_len))
 	return out
 }
-
-//
-// eof
-//

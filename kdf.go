@@ -6,6 +6,10 @@ package hydrogen
 // #include <hydrogen.h>
 import "C"
 
+import (
+	"unsafe"
+)
+
 const (
 	KdfContextBytes int = C.hydro_kdf_CONTEXTBYTES
 	KdfKeyBytes     int = C.hydro_kdf_KEYBYTES
@@ -27,18 +31,15 @@ func KdfDeriveFromKey(subkey_len int, id uint64, ctx string, master_key []byte) 
 	CheckSize(master_key, KdfKeyBytes, "kdf-master_key")
 	CheckCtx(ctx, KdfContextBytes)
 	CheckIntInRange(subkey_len, KdfMinBytes, KdfMaxBytes, "kdf-subkey_len")
+	cCtx := []byte(ctx)
 	out := make([]byte, subkey_len)
 
 	exit := int(C.hydro_kdf_derive_from_key(
 		(*C.uint8_t)(&out[0]),
 		(C.size_t)(subkey_len),
 		(C.uint64_t)(id),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&master_key[0])))
 
 	return out, exit
 }
-
-//
-// eof
-//

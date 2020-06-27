@@ -88,7 +88,3 @@ func AlignedSlice(size, alignment int) []byte {
 	offset := alignment - int(uintptr(unsafe.Pointer(&slice[0])))%alignment
 	return slice[offset : offset+size]
 }
-
-//
-// eof
-//

@@ -55,6 +55,7 @@ func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 	CheckCtx(ctx, SignContextBytes)
 	CheckSize(sk, SignSecretKeyBytes, "sign sk")
 	mlen := len(m)
+	cCtx := []byte(ctx)
 	out := make([]byte, SignBytes)
 
 	// Returns 0 on success
@@ -62,7 +63,7 @@ func SignCreate(m []byte, ctx string, sk []byte) ([]byte, int) {
 		(*C.uint8_t)(&out[0]),
 		unsafe.Pointer(&m[0]),
 		(C.size_t)(mlen),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&sk[0])))
 
 	return out, exit
@@ -75,13 +76,14 @@ func SignVerify(sig []byte, m []byte, ctx string, pk []byte) bool {
 	CheckCtx(ctx, SignContextBytes)
 	CheckSize(pk, SignPublicKeyBytes, "sign pk")
 	mlen := len(m)
+	cCtx := []byte(ctx)
 
 	// Returns 0 on success
 	exit := int(C.hydro_sign_verify(
 		(*C.uint8_t)(&sig[0]),
 		unsafe.Pointer(&m[0]),
 		(C.size_t)(mlen),
-		C.CString(ctx),
+		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&pk[0])))
 
 	return bool(exit == 0)
@@ -114,7 +116,12 @@ func NewSignState() SignState {
 func NewSignHelper(ctx string) SignHelper {
 	CheckCtx(ctx, SignContextBytes)
 	st := NewSignState()
-	C.hydro_sign_init(st.inner, C.CString(ctx))
+	cCtx := []byte(ctx)
+
+	C.hydro_sign_init(
+		st.inner,
+		(*C.char)(unsafe.Pointer(&cCtx[0])))
+
 	return SignHelper{
 		state:   st,
 		context: ctx,
@@ -154,7 +161,3 @@ func (s *SignHelper) FinalVerify(sig []byte, pk []byte) bool {
 		(*C.uint8_t)(&pk[0])))
 	return bool(exit == 0)
 }
-
-//
-// eof
-//
