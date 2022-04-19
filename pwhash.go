@@ -49,7 +49,7 @@ func PwHashDeterministic(h_len int, passwd string, ctx string, master_key []byte
 		(*C.char)(unsafe.Pointer(&cCtx[0])),
 		(*C.uint8_t)(&master_key[0]),
 		C.size_t(opslimit),
-		C.size_t(PwHashDeterministicMemLimit),
+		C.ulonglong(PwHashDeterministicMemLimit),
 		C.uint8_t(PwHashDeterministicThreads)))
 
 	return out, exit
