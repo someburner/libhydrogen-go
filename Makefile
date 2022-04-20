@@ -19,7 +19,7 @@ libhydrogen-clean:
 	make -C libhydrogen clean
 
 ################################################################################
-.PHONY: fmt run test
+.PHONY: fmt run test run_custom_ld rerun
 fmt:
 	$(SHELL) scripts/cmd.sh "fmt"
 
@@ -29,6 +29,11 @@ test:
 run:
 	env CGO_ENABLED=1 go run tests/main.go
 
+run_custom_ld:
+	env CGO_ENABLED=1 CGO_LDFLAGS="-L/path/to/libhydrogen" CGO_CFLAGS="-I/path/to/libhydrogen" go run tests/main.go
+
+rerun:
+	env CGO_ENABLED=1 go run -a tests/main.go
 ################################################################################
 .PHONY: race
 race:
