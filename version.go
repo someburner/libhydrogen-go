@@ -1,7 +1,6 @@
 package hydrogen
 
-// #cgo CFLAGS: -Ilibhydrogen
-// #cgo LDFLAGS: -Llibhydrogen -lhydrogen
+// #cgo LDFLAGS: -lhydrogen
 // #include <hydrogen.h>
 import "C"
 
