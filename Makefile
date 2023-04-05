@@ -21,7 +21,7 @@ libhydrogen-clean:
 ################################################################################
 .PHONY: fmt run test run_custom_ld rerun
 fmt:
-	$(SHELL) scripts/cmd.sh "fmt"
+	go fmt ./...;
 
 test:
 	env CGO_ENABLED=1 go test *_test.go
