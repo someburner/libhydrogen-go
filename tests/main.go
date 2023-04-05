@@ -17,6 +17,7 @@ func main() {
 	ExampleSecretbox()
 	ExampleSign()
 	fmt.Println("\n\nOKAY\nAll Example methods ran to completion\n")
+	fmt.Println(hydro.VersionVerbose())
 }
 
 const GOOD_CTX = "goctx123"

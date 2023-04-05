@@ -53,7 +53,7 @@ func CheckIntGtOrEq(n int, lower int, descrip string) {
 	}
 }
 
-//MemZero sets the buffer to zero
+// MemZero sets the buffer to zero
 func MemZero(buf []byte) {
 	if len(buf) > 0 {
 		C.hydro_memzero(unsafe.Pointer(&buf[0]), C.size_t(len(buf)))

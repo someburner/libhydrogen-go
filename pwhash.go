@@ -27,10 +27,7 @@ func PwHashKeygen() []byte {
 }
 
 // Prototype:
-// int hydro_pwhash_deterministic(uint8_t *h, size_t h_len, const char *passwd,
-//     size_t passwd_len, const char ctx[hydro_pwhash_CONTEXTBYTES],
-//     const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES],
-//     uint64_t opslimit, size_t memlimit, uint8_t threads);
+// int hydro_pwhash_deterministic(uint8_t *h, size_t h_len, const char *passwd, size_t passwd_len, const char ctx[hydro_pwhash_CONTEXTBYTES], const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit, size_t memlimit, uint8_t threads);
 func PwHashDeterministic(h_len int, passwd string, ctx string, master_key []byte, opslimit uint64) ([]byte, int) {
 	CheckIntGt(h_len, 0, "h_len")
 	CheckIntGt(len(passwd), 0, "len(passwd)")
@@ -55,10 +52,7 @@ func PwHashDeterministic(h_len int, passwd string, ctx string, master_key []byte
 }
 
 // Prototype:
-// int hydro_pwhash_create(uint8_t stored[hydro_pwhash_STOREDBYTES],
-//     const char *passwd, size_t passwd_len,
-//     const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit,
-//     size_t memlimit, uint8_t threads);
+// int hydro_pwhash_create(uint8_t stored[hydro_pwhash_STOREDBYTES], const char *passwd, size_t passwd_len, const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit, size_t memlimit, uint8_t threads);
 func PwHashCreate(passwd string, master_key []byte, opslimit uint64, memlimit int, threads uint8) ([]byte, int) {
 	CheckIntGt(len(passwd), 0, "len(passwd)")
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
@@ -78,10 +72,7 @@ func PwHashCreate(passwd string, master_key []byte, opslimit uint64, memlimit in
 }
 
 // Prototype:
-// int hydro_pwhash_verify(const uint8_t stored[hydro_pwhash_STOREDBYTES],
-//     const char *passwd, size_t passwd_len,
-//     const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES],
-//     uint64_t opslimit_max, size_t memlimit_max, uint8_t threads_max);
+// int hydro_pwhash_verify(const uint8_t stored[hydro_pwhash_STOREDBYTES], const char *passwd, size_t passwd_len, const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit_max, size_t memlimit_max, uint8_t threads_max);
 func PwHashVerify(stored []byte, passwd string, master_key []byte, opslimit_max uint64, memlimit_max int, threads_max uint8) int {
 	CheckIntGt(len(passwd), 0, "len(passwd)")
 	CheckSize(stored, PwHashStoredBytes, "stored len")
@@ -101,12 +92,7 @@ func PwHashVerify(stored []byte, passwd string, master_key []byte, opslimit_max 
 }
 
 // Prototype:
-// int hydro_pwhash_derive_static_key(uint8_t *static_key,
-//     size_t static_key_len, const uint8_t stored[hydro_pwhash_STOREDBYTES],
-//     const char *passwd, size_t passwd_len,
-//     const char ctx[hydro_pwhash_CONTEXTBYTES],
-//     const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES],
-//     uint64_t opslimit_max, size_t memlimit_max, uint8_t threads_max);
+// int hydro_pwhash_derive_static_key(uint8_t *static_key, size_t static_key_len, const uint8_t stored[hydro_pwhash_STOREDBYTES], const char *passwd, size_t passwd_len, const char ctx[hydro_pwhash_CONTEXTBYTES], const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit_max, size_t memlimit_max, uint8_t threads_max);
 func PwHashDeriveStaticKey(static_key_len int, stored []byte, passwd string, ctx string, master_key []byte, opslimit_max uint64, memlimit_max int, threads_max uint8) ([]byte, int) {
 	CheckIntGt(static_key_len, 0, "len(static_key_len)")
 	CheckSize(stored, PwHashStoredBytes, "stored len")
@@ -133,9 +119,7 @@ func PwHashDeriveStaticKey(static_key_len int, stored []byte, passwd string, ctx
 }
 
 // Prototype:
-// int hydro_pwhash_reencrypt(uint8_t stored[hydro_pwhash_STOREDBYTES],
-//     const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES],
-//     const uint8_t new_master_key[hydro_pwhash_MASTERKEYBYTES]);
+// int hydro_pwhash_reencrypt(uint8_t stored[hydro_pwhash_STOREDBYTES], const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], const uint8_t new_master_key[hydro_pwhash_MASTERKEYBYTES]);
 func PwHashReEncrypt(stored []byte, master_key []byte, new_master_key []byte) int {
 	CheckSize(stored, PwHashStoredBytes, "stored len")
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
@@ -150,9 +134,7 @@ func PwHashReEncrypt(stored []byte, master_key []byte, new_master_key []byte) in
 }
 
 // Prototype:
-// int hydro_pwhash_upgrade(uint8_t stored[hydro_pwhash_STOREDBYTES],
-//     const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit,
-//     size_t memlimit, uint8_t threads);
+// int hydro_pwhash_upgrade(uint8_t stored[hydro_pwhash_STOREDBYTES], const uint8_t master_key[hydro_pwhash_MASTERKEYBYTES], uint64_t opslimit, size_t memlimit, uint8_t threads);
 func PwHashUpgrade(stored []byte, master_key []byte, opslimit uint64, memlimit int, threads uint8) int {
 	CheckSize(stored, PwHashStoredBytes, "stored len")
 	CheckSize(master_key, PwHashMasterKeyBytes, "master_key len")
